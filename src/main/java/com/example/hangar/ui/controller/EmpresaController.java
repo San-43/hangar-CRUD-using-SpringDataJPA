@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleIntegerProperty;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,6 +35,12 @@ public class EmpresaController {
     private TableColumn<Empresa, String> paisColumn;
 
     @FXML
+    private TableColumn<Empresa, Number> hangaresColumn;
+
+    @FXML
+    private TableColumn<Empresa, Number> navesColumn;
+
+    @FXML
     private TextField nombreField;
 
     @FXML
@@ -47,6 +54,10 @@ public class EmpresaController {
         if (empresaTable != null) {
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
             paisColumn.setCellValueFactory(new PropertyValueFactory<>("pais"));
+            hangaresColumn.setCellValueFactory(cellData ->
+                    new SimpleIntegerProperty(cellData.getValue().getHangares().size()));
+            navesColumn.setCellValueFactory(cellData ->
+                    new SimpleIntegerProperty(cellData.getValue().getNaves().size()));
             empresas.setAll(empresaService.findAll());
             empresaTable.setItems(filteredEmpresas);
             empresaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
@@ -101,13 +112,21 @@ public class EmpresaController {
             return;
         }
         String normalized = term.trim().toLowerCase();
+        Integer numericTerm = null;
+        try {
+            numericTerm = Integer.parseInt(term.trim());
+        } catch (NumberFormatException ignored) {
+            // El término de búsqueda no es numérico.
+        }
         filteredEmpresas.setPredicate(empresa -> {
             if (empresa == null) {
                 return false;
             }
             boolean matchesNombre = empresa.getNombre() != null && empresa.getNombre().toLowerCase().contains(normalized);
             boolean matchesPais = empresa.getPais() != null && empresa.getPais().toLowerCase().contains(normalized);
-            return matchesNombre || matchesPais;
+            boolean matchesHangares = numericTerm != null && empresa.getHangares().size() == numericTerm;
+            boolean matchesNaves = numericTerm != null && empresa.getNaves().size() == numericTerm;
+            return matchesNombre || matchesPais || matchesHangares || matchesNaves;
         });
     }
 

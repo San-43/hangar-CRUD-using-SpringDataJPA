@@ -41,6 +41,8 @@
             <columns>
                 <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="200" />
                 <TableColumn fx:id="paisColumn" text="País" prefWidth="120" />
+                <TableColumn fx:id="hangaresColumn" text="# Hangares" prefWidth="120" />
+                <TableColumn fx:id="navesColumn" text="# Naves" prefWidth="120" />
             </columns>
         </TableView>
     </center>
