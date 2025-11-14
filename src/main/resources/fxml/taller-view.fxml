@@ -39,8 +39,11 @@
     <center>
         <TableView fx:id="tallerTable">
             <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
                 <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180" />
                 <TableColumn fx:id="especialidadColumn" text="Especialidad" prefWidth="220" />
+                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="140" />
+                <TableColumn fx:id="reportesColumn" text="# Reportes" prefWidth="120" />
             </columns>
         </TableView>
     </center>

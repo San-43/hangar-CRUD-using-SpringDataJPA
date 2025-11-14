@@ -2,6 +2,7 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Piloto;
 import com.example.hangar.service.PilotoService;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,6 +45,12 @@ public class PilotoController {
     private TableColumn<Piloto, String> experienciaColumn;
 
     @FXML
+    private TableColumn<Piloto, String> rolColumn;
+
+    @FXML
+    private TableColumn<Piloto, Number> tripulacionesColumn;
+
+    @FXML
     private TextField nombresField;
 
     @FXML
@@ -70,6 +77,10 @@ public class PilotoController {
             licenciaColumn.setCellValueFactory(new PropertyValueFactory<>("licencia"));
             experienciaColumn.setCellValueFactory(piloto -> new SimpleStringProperty(
                     piloto.getValue().getExperiencia() != null ? piloto.getValue().getExperiencia() : ""));
+            rolColumn.setCellValueFactory(piloto -> new SimpleStringProperty(
+                    piloto.getValue().getRol() != null ? piloto.getValue().getRol().getNombre() : ""));
+            tripulacionesColumn.setCellValueFactory(piloto -> new SimpleIntegerProperty(
+                    piloto.getValue().getTripulaciones() != null ? piloto.getValue().getTripulaciones().size() : 0));
             pilotos.setAll(pilotoService.findAll());
             pilotoTable.setItems(filteredPilotos);
             pilotoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));

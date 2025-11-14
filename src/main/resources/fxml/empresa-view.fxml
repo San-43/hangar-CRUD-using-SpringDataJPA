@@ -39,6 +39,7 @@
     <center>
         <TableView fx:id="empresaTable">
             <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
                 <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="200" />
                 <TableColumn fx:id="paisColumn" text="País" prefWidth="120" />
                 <TableColumn fx:id="hangaresColumn" text="# Hangares" prefWidth="120" />

@@ -45,6 +45,8 @@
                 <TableColumn fx:id="codigoColumn" text="Código" prefWidth="140" />
                 <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="200" />
                 <TableColumn fx:id="fechaColumn" text="Fecha de salida" prefWidth="180" />
+                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="160" />
+                <TableColumn fx:id="tripulacionColumn" text="Tripulación" prefWidth="180" />
             </columns>
         </TableView>
     </center>

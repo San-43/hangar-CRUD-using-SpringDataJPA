@@ -39,8 +39,12 @@
     <center>
         <TableView fx:id="naveTable">
             <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
                 <TableColumn fx:id="matriculaColumn" text="Matrícula" prefWidth="200" />
                 <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120" />
+                <TableColumn fx:id="modeloColumn" text="Modelo" prefWidth="180" />
+                <TableColumn fx:id="empresaColumn" text="Empresa" prefWidth="180" />
+                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="120" />
             </columns>
         </TableView>
     </center>

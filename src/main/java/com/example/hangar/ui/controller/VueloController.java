@@ -44,6 +44,12 @@ public class VueloController {
     private TableColumn<Vuelo, String> fechaColumn;
 
     @FXML
+    private TableColumn<Vuelo, String> naveColumn;
+
+    @FXML
+    private TableColumn<Vuelo, String> tripulacionColumn;
+
+    @FXML
     private TextField codigoField;
 
     @FXML
@@ -61,6 +67,10 @@ public class VueloController {
             codigoColumn.setCellValueFactory(new PropertyValueFactory<>("codigo"));
             destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destino"));
             fechaColumn.setCellValueFactory(vuelo -> new SimpleStringProperty(formatFecha(vuelo.getValue().getFechaSalida())));
+            naveColumn.setCellValueFactory(vuelo -> new SimpleStringProperty(
+                    vuelo.getValue().getNave() != null ? vuelo.getValue().getNave().getMatricula() : ""));
+            tripulacionColumn.setCellValueFactory(vuelo -> new SimpleStringProperty(
+                    vuelo.getValue().getTripulacion() != null ? vuelo.getValue().getTripulacion().getNombre() : ""));
             vuelos.setAll(vueloService.findAll());
             vueloTable.setItems(filteredVuelos);
             vueloTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));

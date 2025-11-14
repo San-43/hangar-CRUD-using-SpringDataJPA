@@ -2,6 +2,8 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Taller;
 import com.example.hangar.service.TallerService;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,10 +30,19 @@ public class TallerController {
     private TableView<Taller> tallerTable;
 
     @FXML
+    private TableColumn<Taller, Long> idColumn;
+
+    @FXML
     private TableColumn<Taller, String> nombreColumn;
 
     @FXML
     private TableColumn<Taller, String> especialidadColumn;
+
+    @FXML
+    private TableColumn<Taller, String> hangarColumn;
+
+    @FXML
+    private TableColumn<Taller, Number> reportesColumn;
 
     @FXML
     private TextField nombreField;
@@ -45,8 +56,13 @@ public class TallerController {
     @FXML
     public void initialize() {
         if (tallerTable != null) {
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
             especialidadColumn.setCellValueFactory(new PropertyValueFactory<>("especialidad"));
+            hangarColumn.setCellValueFactory(data -> new SimpleStringProperty(
+                    data.getValue().getHangar() != null ? data.getValue().getHangar().getCodigo() : ""));
+            reportesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
+                    data.getValue().getReportes() != null ? data.getValue().getReportes().size() : 0));
             talleres.setAll(tallerService.findAll());
             tallerTable.setItems(filteredTalleres);
             tallerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));

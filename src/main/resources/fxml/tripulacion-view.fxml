@@ -36,7 +36,10 @@
     <center>
         <TableView fx:id="tripulacionTable">
             <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
                 <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="240" />
+                <TableColumn fx:id="integrantesColumn" text="# Integrantes" prefWidth="140" />
+                <TableColumn fx:id="vuelosColumn" text="# Vuelos" prefWidth="120" />
             </columns>
         </TableView>
     </center>
