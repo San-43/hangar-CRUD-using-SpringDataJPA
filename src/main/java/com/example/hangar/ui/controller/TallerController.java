@@ -163,8 +163,12 @@ public class TallerController {
         }
         nombreField.setText(taller.getNombre());
         especialidadField.setText(taller.getEspecialidad());
-        if (hangarCombo != null) {
-            hangarCombo.getSelectionModel().select(taller.getHangar());
+        if (hangarCombo != null && taller.getHangar() != null) {
+            Hangar hangar = hangares.stream()
+                    .filter(h -> h.getId().equals(taller.getHangar().getId()))
+                    .findFirst()
+                    .orElse(null);
+            hangarCombo.getSelectionModel().select(hangar);
         }
     }
 

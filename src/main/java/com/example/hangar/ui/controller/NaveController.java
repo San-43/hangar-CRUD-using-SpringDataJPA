@@ -200,14 +200,26 @@ public class NaveController {
         }
         matriculaField.setText(nave.getMatricula());
         estadoField.setText(nave.getEstado());
-        if (modeloCombo != null) {
-            modeloCombo.getSelectionModel().select(nave.getModelo());
+        if (modeloCombo != null && nave.getModelo() != null) {
+            Modelo modelo = modelos.stream()
+                    .filter(m -> m.getId().equals(nave.getModelo().getId()))
+                    .findFirst()
+                    .orElse(null);
+            modeloCombo.getSelectionModel().select(modelo);
         }
-        if (empresaCombo != null) {
-            empresaCombo.getSelectionModel().select(nave.getEmpresa());
+        if (empresaCombo != null && nave.getEmpresa() != null) {
+            Empresa empresa = empresas.stream()
+                    .filter(e -> e.getId().equals(nave.getEmpresa().getId()))
+                    .findFirst()
+                    .orElse(null);
+            empresaCombo.getSelectionModel().select(empresa);
         }
-        if (hangarCombo != null) {
-            hangarCombo.getSelectionModel().select(nave.getHangar());
+        if (hangarCombo != null && nave.getHangar() != null) {
+            Hangar hangar = hangares.stream()
+                    .filter(h -> h.getId().equals(nave.getHangar().getId()))
+                    .findFirst()
+                    .orElse(null);
+            hangarCombo.getSelectionModel().select(hangar);
         }
     }
 

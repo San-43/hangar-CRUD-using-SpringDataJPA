@@ -160,7 +160,13 @@ public class PersonaController {
         nombresField.setText(persona.getNombres());
         apellidosField.setText(persona.getApellidos());
         documentoField.setText(persona.getDocumento());
-        rolCombo.getSelectionModel().select(persona.getRol());
+        if (rolCombo != null && persona.getRol() != null) {
+            Rol rol = roles.stream()
+                    .filter(r -> r.getId().equals(persona.getRol().getId()))
+                    .findFirst()
+                    .orElse(null);
+            rolCombo.getSelectionModel().select(rol);
+        }
     }
 
     private void clearForm() {

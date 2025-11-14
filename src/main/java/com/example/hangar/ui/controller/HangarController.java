@@ -217,8 +217,12 @@ public class HangarController {
         if (ubicacionField != null) {
             ubicacionField.setText(hangar.getUbicacion());
         }
-        if (empresaCombo != null) {
-            empresaCombo.getSelectionModel().select(hangar.getEmpresa());
+        if (empresaCombo != null && hangar.getEmpresa() != null) {
+            Empresa empresa = empresas.stream()
+                    .filter(e -> e.getId().equals(hangar.getEmpresa().getId()))
+                    .findFirst()
+                    .orElse(null);
+            empresaCombo.getSelectionModel().select(empresa);
         }
     }
 
