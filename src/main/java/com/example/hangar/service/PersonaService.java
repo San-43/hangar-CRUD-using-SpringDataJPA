@@ -1,0 +1,40 @@
+package com.example.hangar.service;
+
+import com.example.hangar.model.Persona;
+import com.example.hangar.repository.PersonaRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional
+public class PersonaService {
+
+    private final PersonaRepository repository;
+
+    public PersonaService(PersonaRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Persona> findAll() {
+        return repository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Persona findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Persona " + id + " no existe"));
+    }
+
+    public Persona save(Persona entity) {
+        return repository.save(entity);
+    }
+
+    public void delete(Long id) {
+        Persona existing = findById(id);
+        repository.delete(existing);
+    }
+}

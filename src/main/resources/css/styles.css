@@ -1,0 +1,9 @@
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", sans-serif;
+    -fx-padding: 16;
+}
+
+.label.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
