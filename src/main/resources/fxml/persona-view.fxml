@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.PersonaController">
+    <top>
+        <VBox spacing="12" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16" />
+            </padding>
+            <Label text="Gestión de personas" styleClass="title" />
+            <GridPane hgap="10" vgap="8">
+                <Label text="Nombres" />
+                <TextField fx:id="nombresField" promptText="Nombres" GridPane.columnIndex="1" />
+
+                <Label text="Apellidos" GridPane.rowIndex="1" />
+                <TextField fx:id="apellidosField" promptText="Apellidos" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Documento" GridPane.rowIndex="2" />
+                <TextField fx:id="documentoField" promptText="Documento" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Rol" GridPane.rowIndex="3" />
+                <ComboBox fx:id="rolCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Seleccione un rol" />
+            </GridPane>
+            <HBox spacing="10">
+                <Button fx:id="guardarButton" text="Guardar / Actualizar" onAction="#onGuardar" />
+                <Button fx:id="eliminarButton" text="Eliminar" onAction="#onEliminar" />
+                <Button fx:id="limpiarButton" text="Limpiar" onAction="#onLimpiar" />
+            </HBox>
+        </VBox>
+    </top>
     <center>
         <TableView fx:id="personaTable">
             <columns>
-                <TableColumn fx:id="nombreColumn" text="Nombres" prefWidth="180" />
+                <TableColumn fx:id="nombreColumn" text="Nombres" prefWidth="160" />
                 <TableColumn fx:id="documentoColumn" text="Documento" prefWidth="140" />
+                <TableColumn fx:id="rolColumn" text="Rol" prefWidth="120" />
             </columns>
         </TableView>
     </center>
