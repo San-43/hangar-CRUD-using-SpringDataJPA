@@ -21,7 +21,7 @@ public class HangarServiceImpl implements HangarService {
     @Override
     @Transactional(readOnly = true)
     public List<Hangar> findAll() {
-        return repository.findAll();
+        return repository.findAllWithEmpresa();
     }
 
     @Override
