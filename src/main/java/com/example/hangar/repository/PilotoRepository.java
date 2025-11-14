@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-import java.util.List;
 
 public interface PilotoRepository extends JpaRepository<Piloto, Long> {
 
     @EntityGraph(attributePaths = {"rol", "tripulaciones"})
+    @Query("select p from Piloto p")
     List<Piloto> findAllWithRolAndTripulaciones();
 }
