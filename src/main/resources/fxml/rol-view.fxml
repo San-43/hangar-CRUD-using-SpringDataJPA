@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.hangar.ui.controller.RolController">
+    <top>
+        <VBox spacing="12" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16" />
+            </padding>
+            <Label text="Gestión de roles" styleClass="title" />
+            <GridPane hgap="10" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="120" />
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="70" />
+                </columnConstraints>
+                <Label text="Nombre" />
+                <TextField fx:id="nombreField" promptText="Nombre del rol"
+                           GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+            </GridPane>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Guardar / Actualizar" onAction="#onGuardar" />
+                <Button text="Eliminar" onAction="#onEliminar" />
+                <Button text="Limpiar" onAction="#onLimpiar" />
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField"
+                           promptText="Buscar por nombre"
+                           HBox.hgrow="ALWAYS" />
+                <Button text="Buscar" onAction="#onBuscar" />
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="8" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="0" right="16" bottom="16" left="16" />
+            </padding>
+            <Label text="Roles registrados" styleClass="subtitle" />
+            <TableView fx:id="rolTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
+                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="400" />
+                </columns>
+                <placeholder>
+                    <Label text="No hay roles registrados. Utilice el formulario superior para agregar uno nuevo." />
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>
+
