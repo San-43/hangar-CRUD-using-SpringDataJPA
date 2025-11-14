@@ -69,6 +69,11 @@ public class MainController {
     }
 
     @FXML
+    private void showEncargados() {
+        loadView("/fxml/encargado-view.fxml");
+    }
+
+    @FXML
     private void showPersonas() {
         loadView("/fxml/persona-view.fxml");
     }

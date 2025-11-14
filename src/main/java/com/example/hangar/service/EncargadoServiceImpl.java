@@ -21,7 +21,7 @@ public class EncargadoServiceImpl implements EncargadoService {
     @Override
     @Transactional(readOnly = true)
     public List<Encargado> findAll() {
-        return repository.findAll();
+        return repository.findAllWithRelations();
     }
 
     @Override
