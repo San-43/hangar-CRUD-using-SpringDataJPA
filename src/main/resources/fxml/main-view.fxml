@@ -18,6 +18,7 @@
             <Button text="Hangares" onAction="#showHangares" />
             <Button text="Encargados" onAction="#showEncargados" />
             <Button text="Empresas" onAction="#showEmpresas" />
+            <Button text="Modelos" onAction="#showModelos" />
             <Button text="Naves" onAction="#showNaves" />
             <Button text="Personas" onAction="#showPersonas" />
             <Button text="Roles" onAction="#showRoles" />
