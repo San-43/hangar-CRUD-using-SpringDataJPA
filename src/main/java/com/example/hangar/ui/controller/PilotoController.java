@@ -1,7 +1,9 @@
 package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Piloto;
+import com.example.hangar.model.Rol;
 import com.example.hangar.service.PilotoService;
+import com.example.hangar.service.RolService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -9,6 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -19,11 +23,14 @@ import org.springframework.stereotype.Component;
 public class PilotoController {
 
     private final PilotoService pilotoService;
+    private final RolService rolService;
     private final ObservableList<Piloto> pilotos = FXCollections.observableArrayList();
     private final FilteredList<Piloto> filteredPilotos = new FilteredList<>(pilotos, piloto -> true);
+    private final ObservableList<Rol> roles = FXCollections.observableArrayList();
 
-    public PilotoController(PilotoService pilotoService) {
+    public PilotoController(PilotoService pilotoService, RolService rolService) {
         this.pilotoService = pilotoService;
+        this.rolService = rolService;
     }
 
     @FXML
@@ -49,6 +56,9 @@ public class PilotoController {
 
     @FXML
     private TableColumn<Piloto, Number> tripulacionesColumn;
+
+    @FXML
+    private ComboBox<Rol> rolCombo;
 
     @FXML
     private TextField nombresField;
@@ -85,6 +95,25 @@ public class PilotoController {
             pilotoTable.setItems(filteredPilotos);
             pilotoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
+
+        if (rolCombo != null) {
+            roles.setAll(rolService.findAll());
+            rolCombo.setItems(roles);
+            rolCombo.setCellFactory(list -> new ListCell<>() {
+                @Override
+                protected void updateItem(Rol rol, boolean empty) {
+                    super.updateItem(rol, empty);
+                    setText(empty || rol == null ? null : rol.getNombre());
+                }
+            });
+            rolCombo.setButtonCell(new ListCell<>() {
+                @Override
+                protected void updateItem(Rol rol, boolean empty) {
+                    super.updateItem(rol, empty);
+                    setText(empty || rol == null ? null : rol.getNombre());
+                }
+            });
+        }
     }
 
     @FXML
@@ -100,6 +129,7 @@ public class PilotoController {
         piloto.setDocumento(documentoField.getText().trim());
         piloto.setLicencia(licenciaField.getText().trim());
         piloto.setExperiencia(experienciaField.getText().trim());
+        piloto.setRol(rolCombo.getValue());
         pilotoService.save(piloto);
         refreshTable();
         clearForm();
@@ -156,7 +186,8 @@ public class PilotoController {
                 && apellidosField != null && !apellidosField.getText().isBlank()
                 && documentoField != null && !documentoField.getText().isBlank()
                 && licenciaField != null && !licenciaField.getText().isBlank()
-                && experienciaField != null && !experienciaField.getText().isBlank();
+                && experienciaField != null && !experienciaField.getText().isBlank()
+                && rolCombo != null && rolCombo.getValue() != null;
     }
 
     private void refreshTable() {
@@ -175,6 +206,9 @@ public class PilotoController {
         documentoField.setText(piloto.getDocumento());
         licenciaField.setText(piloto.getLicencia());
         experienciaField.setText(piloto.getExperiencia());
+        if (rolCombo != null) {
+            rolCombo.getSelectionModel().select(piloto.getRol());
+        }
     }
 
     private void clearForm() {
@@ -192,6 +226,9 @@ public class PilotoController {
         }
         if (experienciaField != null) {
             experienciaField.clear();
+        }
+        if (rolCombo != null) {
+            rolCombo.getSelectionModel().clearSelection();
         }
     }
 
