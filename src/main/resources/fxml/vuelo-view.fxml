@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -27,6 +28,12 @@
 
                 <Label text="Fecha salida" GridPane.rowIndex="2" />
                 <TextField fx:id="fechaSalidaField" promptText="AAAA-MM-DD HH:MM" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Nave" GridPane.rowIndex="3" />
+                <ComboBox fx:id="naveCombo" promptText="Seleccione una nave" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label text="Tripulación" GridPane.rowIndex="4" />
+                <ComboBox fx:id="tripulacionCombo" promptText="Seleccione una tripulación" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />

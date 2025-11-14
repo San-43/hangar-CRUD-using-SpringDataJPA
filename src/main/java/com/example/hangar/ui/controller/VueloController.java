@@ -1,6 +1,10 @@
 package com.example.hangar.ui.controller;
 
+import com.example.hangar.model.Nave;
+import com.example.hangar.model.Tripulacion;
 import com.example.hangar.model.Vuelo;
+import com.example.hangar.service.NaveService;
+import com.example.hangar.service.TripulacionService;
 import com.example.hangar.service.VueloService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -8,11 +12,15 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,10 +33,17 @@ public class VueloController {
 
     private final VueloService vueloService;
     private final ObservableList<Vuelo> vuelos = FXCollections.observableArrayList();
+    private final ObservableList<Nave> naves = FXCollections.observableArrayList();
+    private final ObservableList<Tripulacion> tripulaciones = FXCollections.observableArrayList();
     private final FilteredList<Vuelo> filteredVuelos = new FilteredList<>(vuelos, vuelo -> true);
 
-    public VueloController(VueloService vueloService) {
+    private final NaveService naveService;
+    private final TripulacionService tripulacionService;
+
+    public VueloController(VueloService vueloService, NaveService naveService, TripulacionService tripulacionService) {
         this.vueloService = vueloService;
+        this.naveService = naveService;
+        this.tripulacionService = tripulacionService;
     }
 
     @FXML
@@ -62,6 +77,12 @@ public class VueloController {
     private TextField searchField;
 
     @FXML
+    private ComboBox<Nave> naveCombo;
+
+    @FXML
+    private ComboBox<Tripulacion> tripulacionCombo;
+
+    @FXML
     public void initialize() {
         if (vueloTable != null) {
             codigoColumn.setCellValueFactory(new PropertyValueFactory<>("codigo"));
@@ -75,6 +96,16 @@ public class VueloController {
             vueloTable.setItems(filteredVuelos);
             vueloTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
+
+        if (naveCombo != null) {
+            configureNaveCombo();
+        }
+
+        if (tripulacionCombo != null) {
+            configureTripulacionCombo();
+        }
+
+        loadLookupData();
     }
 
     @FXML
@@ -92,6 +123,8 @@ public class VueloController {
         vuelo.setCodigo(codigoField.getText().trim());
         vuelo.setDestino(destinoField.getText().trim());
         vuelo.setFechaSalida(fecha);
+        vuelo.setNave(naveCombo != null ? naveCombo.getValue() : null);
+        vuelo.setTripulacion(tripulacionCombo != null ? tripulacionCombo.getValue() : null);
         vueloService.save(vuelo);
         refreshTable();
         clearForm();
@@ -170,6 +203,12 @@ public class VueloController {
         codigoField.setText(vuelo.getCodigo());
         destinoField.setText(vuelo.getDestino());
         fechaSalidaField.setText(vuelo.getFechaSalida() != null ? formatFecha(vuelo.getFechaSalida()) : "");
+        if (naveCombo != null) {
+            selectNave(vuelo.getNave());
+        }
+        if (tripulacionCombo != null) {
+            selectTripulacion(vuelo.getTripulacion());
+        }
     }
 
     private void clearForm() {
@@ -182,10 +221,83 @@ public class VueloController {
         if (fechaSalidaField != null) {
             fechaSalidaField.clear();
         }
+        if (naveCombo != null) {
+            naveCombo.getSelectionModel().clearSelection();
+        }
+        if (tripulacionCombo != null) {
+            tripulacionCombo.getSelectionModel().clearSelection();
+        }
     }
 
     private String formatFecha(LocalDateTime fecha) {
         return fecha == null ? "" : fecha.format(FORMATTER);
+    }
+
+    private void loadLookupData() {
+        naves.setAll(naveService.findAll());
+        tripulaciones.setAll(tripulacionService.findAll());
+    }
+
+    private void configureNaveCombo() {
+        naveCombo.setItems(naves);
+        naveCombo.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Nave item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getMatricula());
+            }
+        });
+        naveCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Nave item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getMatricula());
+            }
+        });
+    }
+
+    private void configureTripulacionCombo() {
+        tripulacionCombo.setItems(tripulaciones);
+        tripulacionCombo.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Tripulacion item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getNombre());
+            }
+        });
+        tripulacionCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Tripulacion item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getNombre());
+            }
+        });
+    }
+
+    private void selectNave(Nave nave) {
+        if (nave == null) {
+            naveCombo.getSelectionModel().clearSelection();
+            return;
+        }
+        naves.stream()
+                .filter(item -> Objects.equals(item.getId(), nave.getId()))
+                .findFirst()
+                .ifPresentOrElse(
+                        item -> naveCombo.getSelectionModel().select(item),
+                        () -> naveCombo.getSelectionModel().clearSelection());
+    }
+
+    private void selectTripulacion(Tripulacion tripulacion) {
+        if (tripulacion == null) {
+            tripulacionCombo.getSelectionModel().clearSelection();
+            return;
+        }
+        tripulaciones.stream()
+                .filter(item -> Objects.equals(item.getId(), tripulacion.getId()))
+                .findFirst()
+                .ifPresentOrElse(
+                        item -> tripulacionCombo.getSelectionModel().select(item),
+                        () -> tripulacionCombo.getSelectionModel().clearSelection());
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
