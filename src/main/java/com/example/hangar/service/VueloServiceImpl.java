@@ -41,4 +41,18 @@ public class VueloServiceImpl implements VueloService {
         Vuelo existing = findById(id);
         repository.delete(existing);
     }
+
+    // --- added: unique code validation ---
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isCodigoDisponible(String codigo, Long excludeId) {
+        if (codigo == null || codigo.isBlank()) {
+            return false;
+        }
+        String normalized = codigo.trim();
+        if (excludeId == null) {
+            return !repository.existsByCodigo(normalized);
+        }
+        return !repository.existsByCodigoAndIdNot(normalized, excludeId);
+    }
 }

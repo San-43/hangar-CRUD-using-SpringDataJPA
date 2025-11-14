@@ -13,4 +13,6 @@ public interface EmpresaService {
     Empresa save(Empresa entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

@@ -13,4 +13,7 @@ public interface VueloService {
     Vuelo save(Vuelo entity);
 
     void delete(Long id);
+
+    // --- added: unique code validation ---
+    boolean isCodigoDisponible(String codigo, Long excludeId);
 }

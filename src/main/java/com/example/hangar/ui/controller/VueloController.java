@@ -18,6 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -119,16 +120,32 @@ public class VueloController {
             return;
         }
         Vuelo selected = vueloTable.getSelectionModel().getSelectedItem();
+        Long excludeId = selected != null ? selected.getId() : null;
+        String codigo = codigoField.getText().trim();
+
+        // Validación previa de unicidad de código
+        if (!vueloService.isCodigoDisponible(codigo, excludeId)) {
+            showAlert(Alert.AlertType.WARNING, "Código duplicado",
+                    "Ya existe un vuelo con el código '" + codigo + "'. Ingrese un código diferente.");
+            return;
+        }
+
         Vuelo vuelo = selected != null ? vueloService.findById(selected.getId()) : new Vuelo();
-        vuelo.setCodigo(codigoField.getText().trim());
+        vuelo.setCodigo(codigo);
         vuelo.setDestino(destinoField.getText().trim());
         vuelo.setFechaSalida(fecha);
         vuelo.setNave(naveCombo != null ? naveCombo.getValue() : null);
         vuelo.setTripulacion(tripulacionCombo != null ? tripulacionCombo.getValue() : null);
-        vueloService.save(vuelo);
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Éxito", "El vuelo ha sido guardado correctamente.");
+        try {
+            vueloService.save(vuelo);
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Éxito", "El vuelo ha sido guardado correctamente.");
+        } catch (DataIntegrityViolationException ex) {
+            // Red de seguridad por si hay condición de carrera o inconsistencia
+            showAlert(Alert.AlertType.ERROR, "Código duplicado",
+                    "No se pudo guardar porque el código '" + codigo + "' ya existe.");
+        }
     }
 
     @FXML

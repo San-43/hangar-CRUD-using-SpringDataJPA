@@ -107,10 +107,27 @@ public class TallerController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir un taller para eliminarlo.");
             return;
         }
-        tallerService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El taller seleccionado fue eliminado.");
+
+        // Validar si el taller tiene registros asociados
+        try {
+            String constraintMessage = tallerService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            tallerService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El taller seleccionado fue eliminado.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar este taller porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el taller: " + e.getMessage());
+        }
     }
 
     @FXML

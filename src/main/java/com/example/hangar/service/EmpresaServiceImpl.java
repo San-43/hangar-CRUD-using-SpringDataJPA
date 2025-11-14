@@ -53,4 +53,31 @@ public class EmpresaServiceImpl implements EmpresaService {
         empresa.getHangares().size();
         empresa.getNaves().size();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String checkDeletionConstraints(Long id) {
+        Empresa empresa = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new EntityNotFoundException("Empresa " + id + " no existe"));
+
+        StringBuilder asociaciones = new StringBuilder();
+        int totalAsociaciones = 0;
+
+        if (empresa.getHangares() != null && !empresa.getHangares().isEmpty()) {
+            asociaciones.append("- ").append(empresa.getHangares().size()).append(" hangar(es)\n");
+            totalAsociaciones += empresa.getHangares().size();
+        }
+
+        if (empresa.getNaves() != null && !empresa.getNaves().isEmpty()) {
+            asociaciones.append("- ").append(empresa.getNaves().size()).append(" nave(s)\n");
+            totalAsociaciones += empresa.getNaves().size();
+        }
+
+        if (totalAsociaciones > 0) {
+            return "Esta empresa tiene los siguientes registros asociados:\n" + asociaciones +
+                   "\nPrimero debe eliminar o reasignar los registros relacionados.";
+        }
+
+        return null; // No hay restricciones
+    }
 }

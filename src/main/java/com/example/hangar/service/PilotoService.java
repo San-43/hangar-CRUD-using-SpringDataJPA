@@ -13,4 +13,6 @@ public interface PilotoService {
     Piloto save(Piloto entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

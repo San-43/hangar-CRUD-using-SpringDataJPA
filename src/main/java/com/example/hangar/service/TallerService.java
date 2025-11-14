@@ -13,4 +13,6 @@ public interface TallerService {
     Taller save(Taller entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

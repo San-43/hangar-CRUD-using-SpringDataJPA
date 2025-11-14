@@ -41,4 +41,19 @@ public class RolServiceImpl implements RolService {
         Rol existing = findById(id);
         repository.delete(existing);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String checkDeletionConstraints(Long id) {
+        findById(id); // Verificar que existe
+
+        long personasCount = repository.countPersonasByRolId(id);
+
+        if (personasCount > 0) {
+            return "Este rol tiene " + personasCount + " persona(s) asociada(s).\n" +
+                   "Primero debe eliminar o reasignar los registros relacionados.";
+        }
+
+        return null; // No hay restricciones
+    }
 }

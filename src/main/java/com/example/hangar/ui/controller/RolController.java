@@ -72,10 +72,27 @@ public class RolController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir un rol para eliminarlo.");
             return;
         }
-        rolService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El rol seleccionado fue eliminado.");
+
+        // Validar si el rol tiene registros asociados
+        try {
+            String constraintMessage = rolService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            rolService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El rol seleccionado fue eliminado.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar este rol porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el rol: " + e.getMessage());
+        }
     }
 
     @FXML

@@ -18,6 +18,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Component
 public class PilotoController {
@@ -97,8 +98,7 @@ public class PilotoController {
         }
 
         if (rolCombo != null) {
-            roles.setAll(rolService.findAll());
-            rolCombo.setItems(roles);
+            // Configurar celdas (opcional, solo para mostrar nombre)
             rolCombo.setCellFactory(list -> new ListCell<>() {
                 @Override
                 protected void updateItem(Rol rol, boolean empty) {
@@ -113,6 +113,13 @@ public class PilotoController {
                     setText(empty || rol == null ? null : rol.getNombre());
                 }
             });
+
+            // Forzar solo rol 'Piloto' en el combo y deshabilitar cambios del usuario
+            Rol defaultRol = getOrCreateDefaultRolPiloto();
+            ObservableList<Rol> soloPiloto = FXCollections.observableArrayList(defaultRol);
+            rolCombo.setItems(soloPiloto);
+            rolCombo.getSelectionModel().select(defaultRol);
+            rolCombo.setDisable(true);
         }
     }
 
@@ -129,7 +136,8 @@ public class PilotoController {
         piloto.setDocumento(documentoField.getText().trim());
         piloto.setLicencia(licenciaField.getText().trim());
         piloto.setExperiencia(experienciaField.getText().trim());
-        piloto.setRol(rolCombo.getValue());
+        // Asignar siempre el rol 'Piloto'
+        piloto.setRol(getOrCreateDefaultRolPiloto());
         pilotoService.save(piloto);
         refreshTable();
         clearForm();
@@ -143,10 +151,27 @@ public class PilotoController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir un piloto para eliminarlo.");
             return;
         }
-        pilotoService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El piloto seleccionado fue eliminado.");
+
+        // Validar si el piloto tiene registros asociados
+        try {
+            String constraintMessage = pilotoService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            pilotoService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El piloto seleccionado fue eliminado.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar este piloto porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el piloto: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -186,8 +211,34 @@ public class PilotoController {
                 && apellidosField != null && !apellidosField.getText().isBlank()
                 && documentoField != null && !documentoField.getText().isBlank()
                 && licenciaField != null && !licenciaField.getText().isBlank()
-                && experienciaField != null && !experienciaField.getText().isBlank()
-                && rolCombo != null && rolCombo.getValue() != null;
+                && experienciaField != null && !experienciaField.getText().isBlank();
+                // Nota: el rol se asigna por defecto si está vacío.
+    }
+
+    private Rol getOrCreateDefaultRolPiloto() {
+        // Buscar en la lista cargada
+        Rol defaultRol = roles.stream()
+                .filter(r -> r.getNombre() != null && r.getNombre().equalsIgnoreCase("Piloto"))
+                .findFirst()
+                .orElse(null);
+        if (defaultRol != null) {
+            return defaultRol;
+        }
+        // No existe: crearlo en BD y añadirlo a la lista
+        Rol nuevo = new Rol();
+        nuevo.setNombre("Piloto");
+        try {
+            Rol guardado = rolService.save(nuevo);
+            roles.add(guardado);
+            return guardado;
+        } catch (DataIntegrityViolationException ex) {
+            // Otro proceso pudo crearlo; recargar y devolver el existente
+            roles.setAll(rolService.findAll());
+            return roles.stream()
+                    .filter(r -> r.getNombre() != null && r.getNombre().equalsIgnoreCase("Piloto"))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     private void refreshTable() {
@@ -206,12 +257,12 @@ public class PilotoController {
         documentoField.setText(piloto.getDocumento());
         licenciaField.setText(piloto.getLicencia());
         experienciaField.setText(piloto.getExperiencia());
-        if (rolCombo != null && piloto.getRol() != null) {
-            Rol rol = roles.stream()
-                    .filter(r -> r.getId().equals(piloto.getRol().getId()))
-                    .findFirst()
-                    .orElse(null);
-            rolCombo.getSelectionModel().select(rol);
+        if (rolCombo != null) {
+            Rol defaultRol = getOrCreateDefaultRolPiloto();
+            if (rolCombo.getItems().isEmpty() || rolCombo.getItems().size() > 1 || rolCombo.getItems().get(0) != defaultRol) {
+                rolCombo.setItems(FXCollections.observableArrayList(defaultRol));
+            }
+            rolCombo.getSelectionModel().select(defaultRol);
         }
     }
 
@@ -232,7 +283,9 @@ public class PilotoController {
             experienciaField.clear();
         }
         if (rolCombo != null) {
-            rolCombo.getSelectionModel().clearSelection();
+            Rol defaultRol = getOrCreateDefaultRolPiloto();
+            rolCombo.setItems(FXCollections.observableArrayList(defaultRol));
+            rolCombo.getSelectionModel().select(defaultRol);
         }
     }
 

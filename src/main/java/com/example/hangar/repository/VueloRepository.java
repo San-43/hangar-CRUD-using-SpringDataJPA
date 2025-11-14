@@ -16,4 +16,9 @@ public interface VueloRepository extends JpaRepository<Vuelo, Long> {
     @Override
     @EntityGraph(attributePaths = {"nave", "tripulacion"})
     Optional<Vuelo> findById(Long id);
+
+    // --- added: unique code helpers ---
+    boolean existsByCodigo(String codigo);
+
+    boolean existsByCodigoAndIdNot(String codigo, Long id);
 }

@@ -10,6 +10,7 @@ module com.example.hangar {
     requires spring.beans;
     requires spring.core;
     requires spring.data.jpa;
+    requires spring.data.commons;
     requires spring.tx;
     requires spring.web;
     requires org.hibernate.orm.core;

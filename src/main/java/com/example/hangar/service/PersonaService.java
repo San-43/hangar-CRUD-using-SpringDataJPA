@@ -13,4 +13,6 @@ public interface PersonaService {
     Persona save(Persona entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

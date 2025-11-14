@@ -13,4 +13,6 @@ public interface HangarService {
     Hangar save(Hangar entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

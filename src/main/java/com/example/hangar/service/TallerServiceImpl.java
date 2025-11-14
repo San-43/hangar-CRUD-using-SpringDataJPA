@@ -41,4 +41,18 @@ public class TallerServiceImpl implements TallerService {
         Taller existing = findById(id);
         repository.delete(existing);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String checkDeletionConstraints(Long id) {
+        Taller taller = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new EntityNotFoundException("Taller " + id + " no existe"));
+
+        if (taller.getReportes() != null && !taller.getReportes().isEmpty()) {
+            return "Este taller tiene " + taller.getReportes().size() + " reporte(s) asociado(s).\n" +
+                   "Primero debe eliminar o reasignar los registros relacionados.";
+        }
+
+        return null; // No hay restricciones
+    }
 }

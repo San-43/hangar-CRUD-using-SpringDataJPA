@@ -113,10 +113,27 @@ public class HangarController {
                     "Debe seleccionar un hangar para eliminarlo.");
             return;
         }
-        hangarService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Hangar eliminado", "El hangar fue eliminado correctamente.");
+
+        // Validar si el hangar tiene registros asociados
+        try {
+            String constraintMessage = hangarService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            hangarService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Hangar eliminado", "El hangar fue eliminado correctamente.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar este hangar porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el hangar: " + e.getMessage());
+        }
     }
 
     @FXML

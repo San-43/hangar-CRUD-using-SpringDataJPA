@@ -121,10 +121,27 @@ public class TripulacionController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir una tripulación para eliminarla.");
             return;
         }
-        tripulacionService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La tripulación seleccionada fue eliminada.");
+
+        // Validar si la tripulación tiene registros asociados
+        try {
+            String constraintMessage = tripulacionService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            tripulacionService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La tripulación seleccionada fue eliminada.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar esta tripulación porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar la tripulación: " + e.getMessage());
+        }
     }
 
     @FXML

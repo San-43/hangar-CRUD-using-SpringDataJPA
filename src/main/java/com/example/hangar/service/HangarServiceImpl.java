@@ -41,4 +41,36 @@ public class HangarServiceImpl implements HangarService {
         Hangar existing = findById(id);
         repository.delete(existing);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String checkDeletionConstraints(Long id) {
+        Hangar hangar = repository.findByIdWithAssociations(id)
+                .orElseThrow(() -> new EntityNotFoundException("Hangar " + id + " no existe"));
+
+        StringBuilder asociaciones = new StringBuilder();
+        int totalAsociaciones = 0;
+
+        if (hangar.getNaves() != null && !hangar.getNaves().isEmpty()) {
+            asociaciones.append("- ").append(hangar.getNaves().size()).append(" nave(s)\n");
+            totalAsociaciones += hangar.getNaves().size();
+        }
+
+        if (hangar.getTalleres() != null && !hangar.getTalleres().isEmpty()) {
+            asociaciones.append("- ").append(hangar.getTalleres().size()).append(" taller(es)\n");
+            totalAsociaciones += hangar.getTalleres().size();
+        }
+
+        if (hangar.getEncargado() != null) {
+            asociaciones.append("- 1 encargado\n");
+            totalAsociaciones++;
+        }
+
+        if (totalAsociaciones > 0) {
+            return "Este hangar tiene los siguientes registros asociados:\n" + asociaciones +
+                   "\nPrimero debe eliminar o reasignar los registros relacionados.";
+        }
+
+        return null; // No hay restricciones
+    }
 }

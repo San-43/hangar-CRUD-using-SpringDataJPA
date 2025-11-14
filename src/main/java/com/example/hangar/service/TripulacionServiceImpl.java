@@ -41,4 +41,18 @@ public class TripulacionServiceImpl implements TripulacionService {
         Tripulacion existing = findById(id);
         repository.delete(existing);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String checkDeletionConstraints(Long id) {
+        Tripulacion tripulacion = repository.findByIdWithIntegrantesAndVuelos(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tripulacion " + id + " no existe"));
+
+        if (tripulacion.getVuelos() != null && !tripulacion.getVuelos().isEmpty()) {
+            return "Esta tripulación tiene " + tripulacion.getVuelos().size() + " vuelo(s) asociado(s).\n" +
+                   "Primero debe eliminar o reasignar los registros relacionados.";
+        }
+
+        return null; // No hay restricciones
+    }
 }

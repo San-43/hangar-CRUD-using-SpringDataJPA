@@ -13,4 +13,6 @@ public interface RolService {
     Rol save(Rol entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

@@ -13,4 +13,6 @@ public interface TripulacionService {
     Tripulacion save(Tripulacion entity);
 
     void delete(Long id);
+
+    String checkDeletionConstraints(Long id);
 }

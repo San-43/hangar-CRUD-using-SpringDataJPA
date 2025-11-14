@@ -127,10 +127,27 @@ public class PersonaController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir una persona para eliminarla.");
             return;
         }
-        personaService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La persona seleccionada fue eliminada.");
+
+        // Validar si la persona tiene registros asociados
+        try {
+            String constraintMessage = personaService.checkDeletionConstraints(selected.getId());
+
+            if (constraintMessage != null) {
+                showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
+                return;
+            }
+
+            personaService.delete(selected.getId());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La persona seleccionada fue eliminada.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar esta persona porque tiene registros asociados. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar la persona: " + e.getMessage());
+        }
     }
 
     @FXML
