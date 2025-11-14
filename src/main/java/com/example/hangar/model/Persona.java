@@ -32,7 +32,7 @@ public class Persona {
     @Column(nullable = false, unique = true, length = 30)
     private String documento;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Rol rol;
 
     @ManyToMany(mappedBy = "integrantes")
