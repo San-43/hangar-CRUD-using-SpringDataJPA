@@ -73,6 +73,11 @@ public class MainController {
         loadView("/fxml/persona-view.fxml");
     }
 
+    @FXML
+    private void showRoles() {
+        loadView("/fxml/rol-view.fxml");
+    }
+
     private void loadView(String resource) {
         if (contentPane == null) {
             return;
