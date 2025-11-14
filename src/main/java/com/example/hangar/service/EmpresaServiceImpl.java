@@ -21,14 +21,18 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     @Transactional(readOnly = true)
     public List<Empresa> findAll() {
-        return repository.findAll();
+        List<Empresa> empresas = repository.findAll();
+        empresas.forEach(this::initializeAssociations);
+        return empresas;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Empresa findById(Long id) {
-        return repository.findById(id)
+        Empresa empresa = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Empresa " + id + " no existe"));
+        initializeAssociations(empresa);
+        return empresa;
     }
 
     @Override
@@ -40,5 +44,13 @@ public class EmpresaServiceImpl implements EmpresaService {
     public void delete(Long id) {
         Empresa existing = findById(id);
         repository.delete(existing);
+    }
+
+    private void initializeAssociations(Empresa empresa) {
+        if (empresa == null) {
+            return;
+        }
+        empresa.getHangares().size();
+        empresa.getNaves().size();
     }
 }
