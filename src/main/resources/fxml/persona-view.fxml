@@ -48,8 +48,10 @@
         <TableView fx:id="personaTable">
             <columns>
                 <TableColumn fx:id="nombreColumn" text="Nombres" prefWidth="160" />
+                <TableColumn fx:id="apellidosColumn" text="Apellidos" prefWidth="160" />
                 <TableColumn fx:id="documentoColumn" text="Documento" prefWidth="140" />
                 <TableColumn fx:id="rolColumn" text="Rol" prefWidth="120" />
+                <TableColumn fx:id="tripulacionesColumn" text="# Tripulaciones" prefWidth="140" />
             </columns>
         </TableView>
     </center>

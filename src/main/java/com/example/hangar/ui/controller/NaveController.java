@@ -2,6 +2,7 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Nave;
 import com.example.hangar.service.NaveService;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,10 +29,22 @@ public class NaveController {
     private TableView<Nave> naveTable;
 
     @FXML
+    private TableColumn<Nave, Long> idColumn;
+
+    @FXML
     private TableColumn<Nave, String> matriculaColumn;
 
     @FXML
     private TableColumn<Nave, String> estadoColumn;
+
+    @FXML
+    private TableColumn<Nave, String> modeloColumn;
+
+    @FXML
+    private TableColumn<Nave, String> empresaColumn;
+
+    @FXML
+    private TableColumn<Nave, String> hangarColumn;
 
     @FXML
     private TextField matriculaField;
@@ -45,8 +58,15 @@ public class NaveController {
     @FXML
     public void initialize() {
         if (naveTable != null) {
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             matriculaColumn.setCellValueFactory(new PropertyValueFactory<>("matricula"));
             estadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+            modeloColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                    cellData.getValue().getModelo() != null ? cellData.getValue().getModelo().getNombre() : ""));
+            empresaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                    cellData.getValue().getEmpresa() != null ? cellData.getValue().getEmpresa().getNombre() : ""));
+            hangarColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                    cellData.getValue().getHangar() != null ? cellData.getValue().getHangar().getCodigo() : ""));
             naves.setAll(naveService.findAll());
             naveTable.setItems(filteredNaves);
             naveTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));

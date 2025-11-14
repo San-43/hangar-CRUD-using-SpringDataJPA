@@ -4,6 +4,7 @@ import com.example.hangar.model.Persona;
 import com.example.hangar.model.Rol;
 import com.example.hangar.service.PersonaService;
 import com.example.hangar.service.RolService;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,10 +40,16 @@ public class PersonaController {
     private TableColumn<Persona, String> nombreColumn;
 
     @FXML
+    private TableColumn<Persona, String> apellidosColumn;
+
+    @FXML
     private TableColumn<Persona, String> documentoColumn;
 
     @FXML
     private TableColumn<Persona, String> rolColumn;
+
+    @FXML
+    private TableColumn<Persona, Number> tripulacionesColumn;
 
     @FXML
     private TextField nombresField;
@@ -63,9 +70,12 @@ public class PersonaController {
     public void initialize() {
         if (personaTable != null) {
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombres"));
+            apellidosColumn.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
             documentoColumn.setCellValueFactory(new PropertyValueFactory<>("documento"));
             rolColumn.setCellValueFactory(data -> new SimpleStringProperty(
                     data.getValue().getRol() != null ? data.getValue().getRol().getNombre() : ""));
+            tripulacionesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
+                    data.getValue().getTripulaciones() != null ? data.getValue().getTripulaciones().size() : 0));
             personas.setAll(personaService.findAll());
             personaTable.setItems(filteredPersonas);
             personaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));

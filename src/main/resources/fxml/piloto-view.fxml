@@ -53,6 +53,8 @@
                 <TableColumn fx:id="documentoColumn" text="Documento" prefWidth="120" />
                 <TableColumn fx:id="licenciaColumn" text="Licencia" prefWidth="120" />
                 <TableColumn fx:id="experienciaColumn" text="Experiencia" prefWidth="200" />
+                <TableColumn fx:id="rolColumn" text="Rol" prefWidth="140" />
+                <TableColumn fx:id="tripulacionesColumn" text="# Tripulaciones" prefWidth="140" />
             </columns>
         </TableView>
     </center>
