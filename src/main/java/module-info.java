@@ -1,4 +1,4 @@
-open module com.example.hangar {
+module com.example.hangar {
     requires javafx.controls;
     requires javafx.fxml;
     requires org.kordamp.bootstrapfx.core;
@@ -11,6 +11,7 @@ open module com.example.hangar {
     requires spring.data.jpa;
     requires spring.tx;
     requires spring.web;
+    requires org.hibernate.orm.core;
 
     requires jakarta.persistence;
     requires jakarta.validation;
@@ -22,4 +23,6 @@ open module com.example.hangar {
     exports com.example.hangar.service;
     exports com.example.hangar.ui.controller;
     exports com.example.hangar.util;
+
+    opens com.example.hangar.model to org.hibernate.orm.core, spring.core, spring.beans;
 }
