@@ -21,13 +21,13 @@ public class TripulacionServiceImpl implements TripulacionService {
     @Override
     @Transactional(readOnly = true)
     public List<Tripulacion> findAll() {
-        return repository.findAll();
+        return repository.findAllWithIntegrantesAndVuelos();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Tripulacion findById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdWithIntegrantesAndVuelos(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tripulacion " + id + " no existe"));
     }
 
