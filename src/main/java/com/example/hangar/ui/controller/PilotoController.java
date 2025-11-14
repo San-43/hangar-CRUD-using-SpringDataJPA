@@ -206,8 +206,12 @@ public class PilotoController {
         documentoField.setText(piloto.getDocumento());
         licenciaField.setText(piloto.getLicencia());
         experienciaField.setText(piloto.getExperiencia());
-        if (rolCombo != null) {
-            rolCombo.getSelectionModel().select(piloto.getRol());
+        if (rolCombo != null && piloto.getRol() != null) {
+            Rol rol = roles.stream()
+                    .filter(r -> r.getId().equals(piloto.getRol().getId()))
+                    .findFirst()
+                    .orElse(null);
+            rolCombo.getSelectionModel().select(rol);
         }
     }
 

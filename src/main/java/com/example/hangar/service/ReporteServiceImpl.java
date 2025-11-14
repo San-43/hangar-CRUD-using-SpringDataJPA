@@ -21,13 +21,13 @@ public class ReporteServiceImpl implements ReporteService {
     @Override
     @Transactional(readOnly = true)
     public List<Reporte> findAll() {
-        return repository.findAll();
+        return repository.findAllWithRelations();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Reporte findById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte " + id + " no existe"));
     }
 

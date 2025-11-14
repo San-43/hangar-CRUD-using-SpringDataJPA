@@ -25,6 +25,7 @@
             <Button text="Talleres" onAction="#showTalleres" />
             <Button text="Tripulaciones" onAction="#showTripulaciones" />
             <Button text="Vuelos" onAction="#showVuelos" />
+            <Button text="Reportes" onAction="#showReportes" />
         </VBox>
     </left>
     <center>
