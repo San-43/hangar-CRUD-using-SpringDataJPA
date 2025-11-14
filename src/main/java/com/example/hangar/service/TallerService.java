@@ -1,40 +1,16 @@
 package com.example.hangar.service;
 
 import com.example.hangar.model.Taller;
-import com.example.hangar.repository.TallerRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional
-public class TallerService {
+public interface TallerService {
 
-    private final TallerRepository repository;
+    List<Taller> findAll();
 
-    public TallerService(TallerRepository repository) {
-        this.repository = repository;
-    }
+    Taller findById(Long id);
 
-    @Transactional(readOnly = true)
-    public List<Taller> findAll() {
-        return repository.findAll();
-    }
+    Taller save(Taller entity);
 
-    @Transactional(readOnly = true)
-    public Taller findById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Taller " + id + " no existe"));
-    }
-
-    public Taller save(Taller entity) {
-        return repository.save(entity);
-    }
-
-    public void delete(Long id) {
-        Taller existing = findById(id);
-        repository.delete(existing);
-    }
+    void delete(Long id);
 }
