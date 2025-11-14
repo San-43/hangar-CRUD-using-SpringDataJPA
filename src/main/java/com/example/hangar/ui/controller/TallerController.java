@@ -1,6 +1,8 @@
 package com.example.hangar.ui.controller;
 
+import com.example.hangar.model.Hangar;
 import com.example.hangar.model.Taller;
+import com.example.hangar.service.HangarService;
 import com.example.hangar.service.TallerService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,21 +11,28 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class TallerController {
 
     private final TallerService tallerService;
+    private final HangarService hangarService;
     private final ObservableList<Taller> talleres = FXCollections.observableArrayList();
     private final FilteredList<Taller> filteredTalleres = new FilteredList<>(talleres, taller -> true);
+    private final ObservableList<Hangar> hangares = FXCollections.observableArrayList();
 
-    public TallerController(TallerService tallerService) {
+    public TallerController(TallerService tallerService, HangarService hangarService) {
         this.tallerService = tallerService;
+        this.hangarService = hangarService;
     }
 
     @FXML
@@ -51,6 +60,9 @@ public class TallerController {
     private TextField especialidadField;
 
     @FXML
+    private ComboBox<Hangar> hangarCombo;
+
+    @FXML
     private TextField searchField;
 
     @FXML
@@ -67,6 +79,8 @@ public class TallerController {
             tallerTable.setItems(filteredTalleres);
             tallerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
+
+        populateHangarCombo();
     }
 
     @FXML
@@ -79,6 +93,7 @@ public class TallerController {
         Taller taller = selected != null ? tallerService.findById(selected.getId()) : new Taller();
         taller.setNombre(nombreField.getText().trim());
         taller.setEspecialidad(especialidadField.getText() != null ? especialidadField.getText().trim() : null);
+        taller.setHangar(hangarCombo.getValue());
         tallerService.save(taller);
         refreshTable();
         clearForm();
@@ -104,6 +119,9 @@ public class TallerController {
         if (tallerTable != null) {
             tallerTable.getSelectionModel().clearSelection();
         }
+        if (hangarCombo != null) {
+            hangarCombo.getSelectionModel().clearSelection();
+        }
     }
 
     @FXML
@@ -128,7 +146,8 @@ public class TallerController {
     }
 
     private boolean isFormValid() {
-        return nombreField != null && !nombreField.getText().isBlank();
+        return nombreField != null && !nombreField.getText().isBlank()
+                && hangarCombo != null && hangarCombo.getValue() != null;
     }
 
     private void refreshTable() {
@@ -144,6 +163,9 @@ public class TallerController {
         }
         nombreField.setText(taller.getNombre());
         especialidadField.setText(taller.getEspecialidad());
+        if (hangarCombo != null) {
+            hangarCombo.getSelectionModel().select(taller.getHangar());
+        }
     }
 
     private void clearForm() {
@@ -153,6 +175,9 @@ public class TallerController {
         if (especialidadField != null) {
             especialidadField.clear();
         }
+        if (hangarCombo != null) {
+            hangarCombo.getSelectionModel().clearSelection();
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -161,5 +186,28 @@ public class TallerController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void populateHangarCombo() {
+        if (hangarCombo == null) {
+            return;
+        }
+        List<Hangar> allHangares = hangarService.findAll();
+        hangares.setAll(allHangares);
+        hangarCombo.setItems(hangares);
+        hangarCombo.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Hangar item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getCodigo());
+            }
+        });
+        hangarCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Hangar item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getCodigo());
+            }
+        });
     }
 }
