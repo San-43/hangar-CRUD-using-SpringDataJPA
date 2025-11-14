@@ -21,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 @Component
 public class EncargadoController {
@@ -101,8 +102,31 @@ public class EncargadoController {
         }
         Encargado selected = encargadoTable != null ? encargadoTable.getSelectionModel().getSelectedItem() : null;
         Encargado encargado = selected != null ? encargadoService.findById(selected.getId()) : new Encargado();
-        encargado.setPersona(personaCombo.getValue());
-        encargado.setHangar(hangarCombo.getValue());
+        Persona persona = personaCombo.getValue();
+        Hangar hangar = hangarCombo.getValue();
+
+        if (hangar != null) {
+            Optional<Encargado> existingByHangar = encargadoService.findByHangarId(hangar.getId());
+            if (existingByHangar.filter(found -> isDifferentRecord(encargado, found)).isPresent()) {
+                showAlert(Alert.AlertType.ERROR,
+                        "Hangar ocupado",
+                        "El hangar seleccionado ya tiene un encargado asignado.");
+                return;
+            }
+        }
+
+        if (persona != null) {
+            Optional<Encargado> existingByPersona = encargadoService.findByPersonaId(persona.getId());
+            if (existingByPersona.filter(found -> isDifferentRecord(encargado, found)).isPresent()) {
+                showAlert(Alert.AlertType.ERROR,
+                        "Persona asignada",
+                        "La persona seleccionada ya es encargada de otro hangar.");
+                return;
+            }
+        }
+
+        encargado.setPersona(persona);
+        encargado.setHangar(hangar);
         encargadoService.save(encargado);
         refreshTable();
         clearForm();
@@ -267,6 +291,10 @@ public class EncargadoController {
         if (hangarCombo != null) {
             hangarCombo.getSelectionModel().clearSelection();
         }
+    }
+
+    private boolean isDifferentRecord(Encargado current, Encargado existing) {
+        return current.getId() == null || !current.getId().equals(existing.getId());
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

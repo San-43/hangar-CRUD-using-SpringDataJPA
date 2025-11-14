@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -40,5 +41,17 @@ public class EncargadoServiceImpl implements EncargadoService {
     public void delete(Long id) {
         Encargado existing = findById(id);
         repository.delete(existing);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Encargado> findByHangarId(Long hangarId) {
+        return repository.findByHangar_Id(hangarId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Encargado> findByPersonaId(Long personaId) {
+        return repository.findByPersona_Id(personaId);
     }
 }
