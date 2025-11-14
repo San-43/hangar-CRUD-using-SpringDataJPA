@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.MainController">
+    <left>
+        <VBox spacing="12" BorderPane.alignment="CENTER" styleClass="sidebar">
+            <padding>
+                <Insets top="16" right="12" bottom="16" left="12" />
+            </padding>
+            <Label text="Tablas disponibles" styleClass="title" />
+            <Label text="Selecciona una tabla para gestionar sus registros" wrapText="true" />
+            <Button text="Empresas" onAction="#showEmpresas" />
+            <Button text="Naves" onAction="#showNaves" />
+            <Button text="Personas" onAction="#showPersonas" />
+        </VBox>
+    </left>
     <center>
-        <Label fx:id="welcomeLabel" styleClass="title" text="Hangar" />
+        <StackPane fx:id="contentPane">
+            <children>
+                <VBox alignment="CENTER" spacing="8">
+                    <Label fx:id="welcomeLabel" styleClass="title" text="Hangar" />
+                    <Label text="Usa el menú lateral para comenzar a gestionar la información." />
+                </VBox>
+            </children>
+        </StackPane>
     </center>
 </BorderPane>
