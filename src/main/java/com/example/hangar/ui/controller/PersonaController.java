@@ -7,6 +7,7 @@ import com.example.hangar.service.RolService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
@@ -23,6 +24,7 @@ public class PersonaController {
     private final PersonaService personaService;
     private final RolService rolService;
     private final ObservableList<Persona> personas = FXCollections.observableArrayList();
+    private final FilteredList<Persona> filteredPersonas = new FilteredList<>(personas, persona -> true);
     private final ObservableList<Rol> roles = FXCollections.observableArrayList();
 
     public PersonaController(PersonaService personaService, RolService rolService) {
@@ -55,6 +57,9 @@ public class PersonaController {
     private ComboBox<Rol> rolCombo;
 
     @FXML
+    private TextField searchField;
+
+    @FXML
     public void initialize() {
         if (personaTable != null) {
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombres"));
@@ -62,7 +67,7 @@ public class PersonaController {
             rolColumn.setCellValueFactory(data -> new SimpleStringProperty(
                     data.getValue().getRol() != null ? data.getValue().getRol().getNombre() : ""));
             personas.setAll(personaService.findAll());
-            personaTable.setItems(personas);
+            personaTable.setItems(filteredPersonas);
             personaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
 
@@ -134,6 +139,7 @@ public class PersonaController {
     private void refreshTable() {
         personas.setAll(personaService.findAll());
         personaTable.refresh();
+        onBuscar();
     }
 
     private void fillForm(Persona persona) {
@@ -160,6 +166,30 @@ public class PersonaController {
         if (rolCombo != null) {
             rolCombo.getSelectionModel().clearSelection();
         }
+    }
+
+    @FXML
+    private void onBuscar() {
+        if (searchField == null) {
+            return;
+        }
+        String term = searchField.getText();
+        if (term == null || term.isBlank()) {
+            filteredPersonas.setPredicate(persona -> true);
+            return;
+        }
+        String normalized = term.trim().toLowerCase();
+        filteredPersonas.setPredicate(persona -> {
+            if (persona == null) {
+                return false;
+            }
+            boolean matchesNombre = persona.getNombres() != null && persona.getNombres().toLowerCase().contains(normalized);
+            boolean matchesApellido = persona.getApellidos() != null && persona.getApellidos().toLowerCase().contains(normalized);
+            boolean matchesDocumento = persona.getDocumento() != null && persona.getDocumento().toLowerCase().contains(normalized);
+            boolean matchesRol = persona.getRol() != null && persona.getRol().getNombre() != null
+                    && persona.getRol().getNombre().toLowerCase().contains(normalized);
+            return matchesNombre || matchesApellido || matchesDocumento || matchesRol;
+        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.PersonaController">
@@ -35,6 +36,11 @@
                 <Button fx:id="guardarButton" text="Guardar / Actualizar" onAction="#onGuardar" />
                 <Button fx:id="eliminarButton" text="Eliminar" onAction="#onEliminar" />
                 <Button fx:id="limpiarButton" text="Limpiar" onAction="#onLimpiar" />
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Buscar por nombre, apellido o documento"
+                           HBox.hgrow="ALWAYS" />
+                <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
     </top>
