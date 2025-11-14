@@ -118,14 +118,15 @@ public class EmpresaController {
         } catch (NumberFormatException ignored) {
             // El término de búsqueda no es numérico.
         }
+        Integer finalNumericTerm = numericTerm;
         filteredEmpresas.setPredicate(empresa -> {
             if (empresa == null) {
                 return false;
             }
             boolean matchesNombre = empresa.getNombre() != null && empresa.getNombre().toLowerCase().contains(normalized);
             boolean matchesPais = empresa.getPais() != null && empresa.getPais().toLowerCase().contains(normalized);
-            boolean matchesHangares = numericTerm != null && empresa.getHangares().size() == numericTerm;
-            boolean matchesNaves = numericTerm != null && empresa.getNaves().size() == numericTerm;
+            boolean matchesHangares = finalNumericTerm != null && empresa.getHangares().size() == finalNumericTerm;
+            boolean matchesNaves = finalNumericTerm != null && empresa.getNaves().size() == finalNumericTerm;
             return matchesNombre || matchesPais || matchesHangares || matchesNaves;
         });
     }
