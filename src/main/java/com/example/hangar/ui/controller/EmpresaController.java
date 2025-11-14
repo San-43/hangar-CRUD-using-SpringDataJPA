@@ -29,6 +29,9 @@ public class EmpresaController {
     private TableView<Empresa> empresaTable;
 
     @FXML
+    private TableColumn<Empresa, Long> idColumn;
+
+    @FXML
     private TableColumn<Empresa, String> nombreColumn;
 
     @FXML
@@ -52,6 +55,7 @@ public class EmpresaController {
     @FXML
     public void initialize() {
         if (empresaTable != null) {
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
             paisColumn.setCellValueFactory(new PropertyValueFactory<>("pais"));
             hangaresColumn.setCellValueFactory(cellData ->

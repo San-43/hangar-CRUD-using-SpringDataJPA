@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -24,6 +25,15 @@
 
                 <Label text="Estado" GridPane.rowIndex="1" />
                 <TextField fx:id="estadoField" promptText="Estado actual" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Modelo" GridPane.rowIndex="2" />
+                <ComboBox fx:id="modeloCombo" promptText="Seleccione un modelo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Empresa" GridPane.rowIndex="3" />
+                <ComboBox fx:id="empresaCombo" promptText="Seleccione una empresa" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label text="Hangar" GridPane.rowIndex="4" />
+                <ComboBox fx:id="hangarCombo" promptText="Seleccione un hangar" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -39,8 +49,12 @@
     <center>
         <TableView fx:id="naveTable">
             <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
                 <TableColumn fx:id="matriculaColumn" text="Matrícula" prefWidth="200" />
                 <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120" />
+                <TableColumn fx:id="modeloColumn" text="Modelo" prefWidth="180" />
+                <TableColumn fx:id="empresaColumn" text="Empresa" prefWidth="180" />
+                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="120" />
             </columns>
         </TableView>
     </center>

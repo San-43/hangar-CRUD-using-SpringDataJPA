@@ -2,6 +2,7 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Tripulacion;
 import com.example.hangar.service.TripulacionService;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,7 +29,16 @@ public class TripulacionController {
     private TableView<Tripulacion> tripulacionTable;
 
     @FXML
+    private TableColumn<Tripulacion, Long> idColumn;
+
+    @FXML
     private TableColumn<Tripulacion, String> nombreColumn;
+
+    @FXML
+    private TableColumn<Tripulacion, Number> integrantesColumn;
+
+    @FXML
+    private TableColumn<Tripulacion, Number> vuelosColumn;
 
     @FXML
     private TextField nombreField;
@@ -39,7 +49,12 @@ public class TripulacionController {
     @FXML
     public void initialize() {
         if (tripulacionTable != null) {
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            integrantesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
+                    data.getValue().getIntegrantes() != null ? data.getValue().getIntegrantes().size() : 0));
+            vuelosColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
+                    data.getValue().getVuelos() != null ? data.getValue().getVuelos().size() : 0));
             tripulaciones.setAll(tripulacionService.findAll());
             tripulacionTable.setItems(filteredTripulaciones);
             tripulacionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
