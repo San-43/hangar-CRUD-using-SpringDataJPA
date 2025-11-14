@@ -11,22 +11,19 @@
 <?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.hangar.ui.controller.VueloController">
+            fx:controller="com.example.hangar.ui.controller.TallerController">
     <top>
         <VBox spacing="12" BorderPane.alignment="CENTER">
             <padding>
                 <Insets top="16" right="16" bottom="16" left="16" />
             </padding>
-            <Label text="Gestión de vuelos" styleClass="title" />
+            <Label text="Gestión de talleres" styleClass="title" />
             <GridPane hgap="10" vgap="8">
-                <Label text="Código" />
-                <TextField fx:id="codigoField" promptText="Código del vuelo" GridPane.columnIndex="1" />
+                <Label text="Nombre" />
+                <TextField fx:id="nombreField" promptText="Nombre del taller" GridPane.columnIndex="1" />
 
-                <Label text="Destino" GridPane.rowIndex="1" />
-                <TextField fx:id="destinoField" promptText="Destino" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                <Label text="Fecha salida" GridPane.rowIndex="2" />
-                <TextField fx:id="fechaSalidaField" promptText="AAAA-MM-DD HH:MM" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Especialidad" GridPane.rowIndex="1" />
+                <TextField fx:id="especialidadField" promptText="Especialidad del taller" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -34,17 +31,16 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por código, destino o fecha" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por nombre o especialidad" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
     </top>
     <center>
-        <TableView fx:id="vueloTable">
+        <TableView fx:id="tallerTable">
             <columns>
-                <TableColumn fx:id="codigoColumn" text="Código" prefWidth="140" />
-                <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="200" />
-                <TableColumn fx:id="fechaColumn" text="Fecha de salida" prefWidth="180" />
+                <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180" />
+                <TableColumn fx:id="especialidadColumn" text="Especialidad" prefWidth="220" />
             </columns>
         </TableView>
     </center>
