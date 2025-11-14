@@ -24,5 +24,12 @@ module com.example.hangar {
     exports com.example.hangar.ui.controller;
     exports com.example.hangar.util;
 
-    opens com.example.hangar.model to org.hibernate.orm.core, spring.core, spring.beans;
+    opens com.example.hangar
+            to spring.core, spring.beans, spring.context, javafx.fxml;
+
+    opens com.example.hangar.model
+            to org.hibernate.orm.core, spring.core, spring.beans;
+
+    opens com.example.hangar.ui.controller
+            to javafx.fxml, spring.core, spring.beans, spring.context;
 }
