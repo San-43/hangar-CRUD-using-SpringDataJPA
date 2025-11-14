@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.hangar.ui.controller.MainController">
+    <center>
+        <Label fx:id="welcomeLabel" styleClass="title" text="Hangar" />
+    </center>
+</BorderPane>

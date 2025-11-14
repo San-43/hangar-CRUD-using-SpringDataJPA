@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.hangar.ui.controller.VueloController">
+    <center>
+        <TableView fx:id="vueloTable">
+            <columns>
+                <TableColumn fx:id="codigoColumn" text="Código" prefWidth="120" />
+                <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="180" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>
