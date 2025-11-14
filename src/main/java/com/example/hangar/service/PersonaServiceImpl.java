@@ -21,7 +21,7 @@ public class PersonaServiceImpl implements PersonaService {
     @Override
     @Transactional(readOnly = true)
     public List<Persona> findAll() {
-        return repository.findAll();
+        return repository.findAllWithRolAndTripulaciones();
     }
 
     @Override

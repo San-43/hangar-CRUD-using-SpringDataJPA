@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
@@ -20,6 +21,10 @@
             </padding>
             <Label text="Gestión de personas" styleClass="title" />
             <GridPane hgap="10" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120" halignment="RIGHT" />
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="100" />
+                </columnConstraints>
                 <Label text="Nombres" />
                 <TextField fx:id="nombresField" promptText="Nombres" GridPane.columnIndex="1" />
 

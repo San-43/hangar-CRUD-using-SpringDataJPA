@@ -21,7 +21,7 @@ public class PilotoServiceImpl implements PilotoService {
     @Override
     @Transactional(readOnly = true)
     public List<Piloto> findAll() {
-        return repository.findAll();
+        return repository.findAllWithRolAndTripulaciones();
     }
 
     @Override
