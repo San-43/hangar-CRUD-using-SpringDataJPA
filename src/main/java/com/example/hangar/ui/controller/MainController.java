@@ -39,6 +39,11 @@ public class MainController {
     }
 
     @FXML
+    private void showHangares() {
+        loadView("/fxml/hangar-view.fxml");
+    }
+
+    @FXML
     private void showPilotos() {
         loadView("/fxml/piloto-view.fxml");
     }
