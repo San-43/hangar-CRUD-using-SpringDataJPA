@@ -28,10 +28,10 @@ public class Hangar {
     @OneToOne(mappedBy = "hangar", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Encargado encargado;
 
-    @OneToMany(mappedBy = "hangar")
+    @OneToMany(mappedBy = "hangar", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Taller> talleres = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "hangar")
+    @OneToMany(mappedBy = "hangar", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Nave> naves = new LinkedHashSet<>();
 
     public Long getId() {

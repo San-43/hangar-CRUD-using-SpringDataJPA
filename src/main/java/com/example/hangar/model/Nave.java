@@ -1,5 +1,6 @@
 package com.example.hangar.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,10 +36,10 @@ public class Nave {
     @ManyToOne(fetch = FetchType.LAZY)
     private Hangar hangar;
 
-    @OneToMany(mappedBy = "nave")
+    @OneToMany(mappedBy = "nave", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Vuelo> vuelos = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "nave")
+    @OneToMany(mappedBy = "nave", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Reporte> reportes = new LinkedHashSet<>();
 
     public Long getId() {
