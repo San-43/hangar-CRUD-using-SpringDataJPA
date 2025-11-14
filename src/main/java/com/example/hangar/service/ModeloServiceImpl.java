@@ -21,14 +21,18 @@ public class ModeloServiceImpl implements ModeloService {
     @Override
     @Transactional(readOnly = true)
     public List<Modelo> findAll() {
-        return repository.findAll();
+        List<Modelo> modelos = repository.findAll();
+        modelos.forEach(this::initializeAssociations);
+        return modelos;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Modelo findById(Long id) {
-        return repository.findById(id)
+        Modelo modelo = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Modelo " + id + " no existe"));
+        initializeAssociations(modelo);
+        return modelo;
     }
 
     @Override
@@ -40,5 +44,12 @@ public class ModeloServiceImpl implements ModeloService {
     public void delete(Long id) {
         Modelo existing = findById(id);
         repository.delete(existing);
+    }
+
+    private void initializeAssociations(Modelo modelo) {
+        if (modelo == null) {
+            return;
+        }
+        modelo.getNaves().size();
     }
 }

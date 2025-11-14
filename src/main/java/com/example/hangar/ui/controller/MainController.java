@@ -88,6 +88,11 @@ public class MainController {
         loadView("/fxml/reporte-view.fxml");
     }
 
+    @FXML
+    private void showModelos() {
+        loadView("/fxml/modelo-view.fxml");
+    }
+
     private void loadView(String resource) {
         if (contentPane == null) {
             return;
