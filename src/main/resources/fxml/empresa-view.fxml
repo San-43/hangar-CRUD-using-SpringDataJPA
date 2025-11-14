@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
@@ -19,32 +20,49 @@
             </padding>
             <Label text="Gestión de empresas" styleClass="title" />
             <GridPane hgap="10" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" minWidth="120" />
+                    <ColumnConstraints hgrow="ALWAYS" percentWidth="70" />
+                </columnConstraints>
                 <Label text="Nombre" />
-                <TextField fx:id="nombreField" promptText="Nombre de la empresa" GridPane.columnIndex="1" />
+                <TextField fx:id="nombreField" promptText="Nombre de la empresa"
+                           GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
 
                 <Label text="País" GridPane.rowIndex="1" />
-                <TextField fx:id="paisField" promptText="País" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <TextField fx:id="paisField" promptText="País"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" />
             </GridPane>
-            <HBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
                 <Button text="Eliminar" onAction="#onEliminar" />
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por nombre o país" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField"
+                           promptText="Buscar por nombre, país o cantidad de hangares/naves"
+                           HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
     </top>
     <center>
-        <TableView fx:id="empresaTable">
-            <columns>
-                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="200" />
-                <TableColumn fx:id="paisColumn" text="País" prefWidth="120" />
-                <TableColumn fx:id="hangaresColumn" text="# Hangares" prefWidth="120" />
-                <TableColumn fx:id="navesColumn" text="# Naves" prefWidth="120" />
-            </columns>
-        </TableView>
+        <VBox spacing="8" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="0" right="16" bottom="16" left="16" />
+            </padding>
+            <Label text="Empresas registradas" styleClass="subtitle" />
+            <TableView fx:id="empresaTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
+                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="220" />
+                    <TableColumn fx:id="paisColumn" text="País" prefWidth="160" />
+                    <TableColumn fx:id="hangaresColumn" text="# Hangares" prefWidth="140" />
+                    <TableColumn fx:id="navesColumn" text="# Naves" prefWidth="140" />
+                </columns>
+                <placeholder>
+                    <Label text="No hay empresas registradas. Utilice el formulario superior para agregar una nueva." />
+                </placeholder>
+            </TableView>
+        </VBox>
     </center>
 </BorderPane>
