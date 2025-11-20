@@ -28,7 +28,7 @@ public class ModeloServiceImpl implements ModeloService {
 
     @Override
     @Transactional(readOnly = true)
-    public Modelo findById(Long id) {
+    public Modelo findById(Integer id) {
         Modelo modelo = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Modelo " + id + " no existe"));
         initializeAssociations(modelo);
@@ -41,7 +41,7 @@ public class ModeloServiceImpl implements ModeloService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Modelo existing = findById(id);
         repository.delete(existing);
     }

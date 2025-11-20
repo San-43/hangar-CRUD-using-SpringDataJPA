@@ -8,9 +8,9 @@ public interface NaveService {
 
     List<Nave> findAll();
 
-    Nave findById(Long id);
+    Nave findById(Integer id);
 
     Nave save(Nave entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

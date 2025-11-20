@@ -28,7 +28,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     @Transactional(readOnly = true)
-    public Empresa findById(Long id) {
+    public Empresa findById(Integer id) {
         Empresa empresa = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Empresa " + id + " no existe"));
         initializeAssociations(empresa);
@@ -41,7 +41,7 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Empresa existing = findById(id);
         repository.delete(existing);
     }
@@ -50,7 +50,6 @@ public class EmpresaServiceImpl implements EmpresaService {
         if (empresa == null) {
             return;
         }
-        empresa.getHangares().size();
         empresa.getNaves().size();
     }
 }

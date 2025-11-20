@@ -26,7 +26,7 @@ public class VueloServiceImpl implements VueloService {
 
     @Override
     @Transactional(readOnly = true)
-    public Vuelo findById(Long id) {
+    public Vuelo findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vuelo " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class VueloServiceImpl implements VueloService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Vuelo existing = findById(id);
         repository.delete(existing);
     }

@@ -8,9 +8,9 @@ public interface TripulacionService {
 
     List<Tripulacion> findAll();
 
-    Tripulacion findById(Long id);
+    Tripulacion findById(Integer id);
 
     Tripulacion save(Tripulacion entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

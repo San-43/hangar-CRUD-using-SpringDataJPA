@@ -8,64 +8,50 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "vuelos")
+@Table(name = "vuelo")
 public class Vuelo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_vuelo")
+    private Integer id;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String codigo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_nave")
+    private Nave nave;
 
-    @Column(length = 120)
+    @Column(length = 100)
+    private String origen;
+
+    @Column(length = 100)
     private String destino;
 
     @Column(name = "fecha_salida")
-    private LocalDateTime fechaSalida;
+    private LocalDateTime fecha_salida;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nave_id")
-    private Nave nave;
+    @Column(name = "fecha_llegada")
+    private LocalDateTime fecha_llegada;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tripulacion_id")
-    private Tripulacion tripulacion;
+    private Integer pasajeros;
 
-    public Long getId() {
+    private Integer distancia;
+
+    @OneToMany(mappedBy = "vuelo")
+    private Set<Tripulacion> tripulaciones = new LinkedHashSet<>();
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getDestino() {
-        return destino;
-    }
-
-    public void setDestino(String destino) {
-        this.destino = destino;
-    }
-
-    public LocalDateTime getFechaSalida() {
-        return fechaSalida;
-    }
-
-    public void setFechaSalida(LocalDateTime fechaSalida) {
-        this.fechaSalida = fechaSalida;
     }
 
     public Nave getNave() {
@@ -76,11 +62,59 @@ public class Vuelo {
         this.nave = nave;
     }
 
-    public Tripulacion getTripulacion() {
-        return tripulacion;
+    public String getOrigen() {
+        return origen;
     }
 
-    public void setTripulacion(Tripulacion tripulacion) {
-        this.tripulacion = tripulacion;
+    public void setOrigen(String origen) {
+        this.origen = origen;
+    }
+
+    public String getDestino() {
+        return destino;
+    }
+
+    public void setDestino(String destino) {
+        this.destino = destino;
+    }
+
+    public LocalDateTime getFecha_salida() {
+        return fecha_salida;
+    }
+
+    public void setFecha_salida(LocalDateTime fecha_salida) {
+        this.fecha_salida = fecha_salida;
+    }
+
+    public LocalDateTime getFecha_llegada() {
+        return fecha_llegada;
+    }
+
+    public void setFecha_llegada(LocalDateTime fecha_llegada) {
+        this.fecha_llegada = fecha_llegada;
+    }
+
+    public Integer getPasajeros() {
+        return pasajeros;
+    }
+
+    public void setPasajeros(Integer pasajeros) {
+        this.pasajeros = pasajeros;
+    }
+
+    public Integer getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(Integer distancia) {
+        this.distancia = distancia;
+    }
+
+    public Set<Tripulacion> getTripulaciones() {
+        return tripulaciones;
+    }
+
+    public void setTripulaciones(Set<Tripulacion> tripulaciones) {
+        this.tripulaciones = tripulaciones;
     }
 }

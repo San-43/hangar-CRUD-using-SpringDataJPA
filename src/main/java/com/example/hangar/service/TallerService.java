@@ -8,9 +8,9 @@ public interface TallerService {
 
     List<Taller> findAll();
 
-    Taller findById(Long id);
+    Taller findById(Integer id);
 
     Taller save(Taller entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

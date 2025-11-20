@@ -8,9 +8,9 @@ public interface PersonaService {
 
     List<Persona> findAll();
 
-    Persona findById(Long id);
+    Persona findById(Integer id);
 
     Persona save(Persona entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

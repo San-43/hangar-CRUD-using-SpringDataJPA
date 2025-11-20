@@ -8,9 +8,9 @@ public interface ModeloService {
 
     List<Modelo> findAll();
 
-    Modelo findById(Long id);
+    Modelo findById(Integer id);
 
     Modelo save(Modelo entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

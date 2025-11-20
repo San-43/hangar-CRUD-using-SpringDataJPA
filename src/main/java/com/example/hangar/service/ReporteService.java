@@ -8,9 +8,9 @@ public interface ReporteService {
 
     List<Reporte> findAll();
 
-    Reporte findById(Long id);
+    Reporte findById(Integer id);
 
     Reporte save(Reporte entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

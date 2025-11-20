@@ -11,55 +11,47 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "modelos")
+@Table(name = "modelo")
 public class Modelo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_modelo")
+    private Integer id;
 
-    @Column(nullable = false, length = 60)
-    private String nombre;
+    private Integer peso;
 
-    @Column(length = 60)
-    private String fabricante;
-
-    @Column
-    private Integer capacidad;
+    @Column(length = 100)
+    private String pais_fabricacion;
 
     @OneToMany(mappedBy = "modelo")
     private Set<Nave> naves = new LinkedHashSet<>();
 
-    public Long getId() {
+    @OneToMany(mappedBy = "modelo")
+    private Set<Piloto> pilotos = new LinkedHashSet<>();
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Integer getPeso() {
+        return peso;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setPeso(Integer peso) {
+        this.peso = peso;
     }
 
-    public String getFabricante() {
-        return fabricante;
+    public String getPais_fabricacion() {
+        return pais_fabricacion;
     }
 
-    public void setFabricante(String fabricante) {
-        this.fabricante = fabricante;
-    }
-
-    public Integer getCapacidad() {
-        return capacidad;
-    }
-
-    public void setCapacidad(Integer capacidad) {
-        this.capacidad = capacidad;
+    public void setPais_fabricacion(String pais_fabricacion) {
+        this.pais_fabricacion = pais_fabricacion;
     }
 
     public Set<Nave> getNaves() {
@@ -68,5 +60,13 @@ public class Modelo {
 
     public void setNaves(Set<Nave> naves) {
         this.naves = naves;
+    }
+
+    public Set<Piloto> getPilotos() {
+        return pilotos;
+    }
+
+    public void setPilotos(Set<Piloto> pilotos) {
+        this.pilotos = pilotos;
     }
 }

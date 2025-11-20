@@ -26,7 +26,7 @@ public class NaveServiceImpl implements NaveService {
 
     @Override
     @Transactional(readOnly = true)
-    public Nave findById(Long id) {
+    public Nave findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nave " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class NaveServiceImpl implements NaveService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Nave existing = findById(id);
         repository.delete(existing);
     }

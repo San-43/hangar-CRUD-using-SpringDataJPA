@@ -7,9 +7,5 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface HangarRepository extends JpaRepository<Hangar, Long> {
-
-    @EntityGraph(attributePaths = "empresa")
-    @Query("SELECT h FROM Hangar h")
-    List<Hangar> findAllWithEmpresa();
+public interface HangarRepository extends JpaRepository<Hangar, Integer> {
 }

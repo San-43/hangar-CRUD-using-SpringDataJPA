@@ -12,30 +12,34 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "empresas")
+@Table(name = "empresa")
 public class Empresa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_empresa")
+    private Integer id;
 
-    @Column(nullable = false, unique = true, length = 120)
+    @Column(length = 100)
     private String nombre;
 
-    @Column(length = 120)
-    private String pais;
+    @Column(length = 100)
+    private String contacto;
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Hangar> hangares = new LinkedHashSet<>();
+    @Column(length = 150)
+    private String ubicacion;
+
+    @Column(length = 20)
+    private String rfc;
 
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Nave> naves = new LinkedHashSet<>();
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -47,20 +51,28 @@ public class Empresa {
         this.nombre = nombre;
     }
 
-    public String getPais() {
-        return pais;
+    public String getContacto() {
+        return contacto;
     }
 
-    public void setPais(String pais) {
-        this.pais = pais;
+    public void setContacto(String contacto) {
+        this.contacto = contacto;
     }
 
-    public Set<Hangar> getHangares() {
-        return hangares;
+    public String getUbicacion() {
+        return ubicacion;
     }
 
-    public void setHangares(Set<Hangar> hangares) {
-        this.hangares = hangares;
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
+    }
+
+    public String getRfc() {
+        return rfc;
+    }
+
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
     }
 
     public Set<Nave> getNaves() {

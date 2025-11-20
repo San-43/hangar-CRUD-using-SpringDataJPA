@@ -2,39 +2,32 @@ package com.example.hangar.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "hangares")
+@Table(name = "hangar")
 public class Hangar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_hangar")
+    private Integer id;
 
-    @Column(nullable = false, unique = true, length = 30)
-    private String codigo;
+    @Column(length = 150)
+    private String descripcion;
 
-    @Column(nullable = false)
     private Integer capacidad;
 
-    @Column(length = 120)
-    private String ubicacion;
+    @Column(length = 100)
+    private String area;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Empresa empresa;
-
-    @OneToOne(mappedBy = "hangar", fetch = FetchType.LAZY)
-    private Encargado encargado;
+    private Integer num;
 
     @OneToMany(mappedBy = "hangar")
     private Set<Taller> talleres = new LinkedHashSet<>();
@@ -42,20 +35,20 @@ public class Hangar {
     @OneToMany(mappedBy = "hangar")
     private Set<Nave> naves = new LinkedHashSet<>();
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public Integer getCapacidad() {
@@ -66,28 +59,20 @@ public class Hangar {
         this.capacidad = capacidad;
     }
 
-    public String getUbicacion() {
-        return ubicacion;
+    public String getArea() {
+        return area;
     }
 
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
+    public void setArea(String area) {
+        this.area = area;
     }
 
-    public Empresa getEmpresa() {
-        return empresa;
+    public Integer getNum() {
+        return num;
     }
 
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-
-    public Encargado getEncargado() {
-        return encargado;
-    }
-
-    public void setEncargado(Encargado encargado) {
-        this.encargado = encargado;
+    public void setNum(Integer num) {
+        this.num = num;
     }
 
     public Set<Taller> getTalleres() {

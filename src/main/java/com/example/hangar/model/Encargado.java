@@ -1,51 +1,62 @@
 package com.example.hangar.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "encargados")
+@Table(name = "encargado")
 public class Encargado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_encargado")
+    private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @Column(length = 100)
+    private String nombre;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hangar_id")
-    private Hangar hangar;
+    @OneToMany(mappedBy = "encargado")
+    private Set<Taller> talleres = new LinkedHashSet<>();
 
-    public Long getId() {
+    @OneToMany(mappedBy = "encargado")
+    private Set<Reporte> reportes = new LinkedHashSet<>();
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public Hangar getHangar() {
-        return hangar;
+    public Set<Taller> getTalleres() {
+        return talleres;
     }
 
-    public void setHangar(Hangar hangar) {
-        this.hangar = hangar;
+    public void setTalleres(Set<Taller> talleres) {
+        this.talleres = talleres;
+    }
+
+    public Set<Reporte> getReportes() {
+        return reportes;
+    }
+
+    public void setReportes(Set<Reporte> reportes) {
+        this.reportes = reportes;
     }
 }

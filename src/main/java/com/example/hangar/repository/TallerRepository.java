@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TallerRepository extends JpaRepository<Taller, Long> {
+public interface TallerRepository extends JpaRepository<Taller, Integer> {
 
     @Override
-    @EntityGraph(attributePaths = {"hangar", "reportes"})
+    @EntityGraph(attributePaths = {"hangar", "encargado", "reportes"})
     List<Taller> findAll();
 }

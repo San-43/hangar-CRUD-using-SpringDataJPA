@@ -21,12 +21,12 @@ public class HangarServiceImpl implements HangarService {
     @Override
     @Transactional(readOnly = true)
     public List<Hangar> findAll() {
-        return repository.findAllWithEmpresa();
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Hangar findById(Long id) {
+    public Hangar findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Hangar " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class HangarServiceImpl implements HangarService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Hangar existing = findById(id);
         repository.delete(existing);
     }

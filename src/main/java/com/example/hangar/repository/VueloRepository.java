@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface VueloRepository extends JpaRepository<Vuelo, Long> {
+public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
 
     @Override
-    @EntityGraph(attributePaths = {"nave", "tripulacion"})
+    @EntityGraph(attributePaths = {"nave"})
     List<Vuelo> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"nave", "tripulacion"})
-    Optional<Vuelo> findById(Long id);
+    @EntityGraph(attributePaths = {"nave"})
+    Optional<Vuelo> findById(Integer id);
 }

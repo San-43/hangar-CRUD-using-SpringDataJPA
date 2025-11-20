@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface NaveRepository extends JpaRepository<Nave, Long> {
+public interface NaveRepository extends JpaRepository<Nave, Integer> {
 
     @Override
     @EntityGraph(attributePaths = {"modelo", "empresa", "hangar"})

@@ -8,9 +8,9 @@ public interface VueloService {
 
     List<Vuelo> findAll();
 
-    Vuelo findById(Long id);
+    Vuelo findById(Integer id);
 
     Vuelo save(Vuelo entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 }

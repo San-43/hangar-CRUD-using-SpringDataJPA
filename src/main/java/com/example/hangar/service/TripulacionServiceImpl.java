@@ -21,13 +21,13 @@ public class TripulacionServiceImpl implements TripulacionService {
     @Override
     @Transactional(readOnly = true)
     public List<Tripulacion> findAll() {
-        return repository.findAllWithIntegrantesAndVuelos();
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Tripulacion findById(Long id) {
-        return repository.findByIdWithIntegrantesAndVuelos(id)
+    public Tripulacion findById(Integer id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tripulacion " + id + " no existe"));
     }
 
@@ -37,7 +37,7 @@ public class TripulacionServiceImpl implements TripulacionService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Tripulacion existing = findById(id);
         repository.delete(existing);
     }

@@ -26,7 +26,7 @@ public class RolServiceImpl implements RolService {
 
     @Override
     @Transactional(readOnly = true)
-    public Rol findById(Long id) {
+    public Rol findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rol " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class RolServiceImpl implements RolService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Rol existing = findById(id);
         repository.delete(existing);
     }

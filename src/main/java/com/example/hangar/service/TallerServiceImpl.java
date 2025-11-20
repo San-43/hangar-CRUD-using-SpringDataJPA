@@ -26,7 +26,7 @@ public class TallerServiceImpl implements TallerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Taller findById(Long id) {
+    public Taller findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Taller " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class TallerServiceImpl implements TallerService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Taller existing = findById(id);
         repository.delete(existing);
     }

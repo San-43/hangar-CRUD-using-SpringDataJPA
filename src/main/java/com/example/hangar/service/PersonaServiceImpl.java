@@ -21,12 +21,12 @@ public class PersonaServiceImpl implements PersonaService {
     @Override
     @Transactional(readOnly = true)
     public List<Persona> findAll() {
-        return repository.findAllWithRolAndTripulaciones();
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Persona findById(Long id) {
+    public Persona findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Persona " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class PersonaServiceImpl implements PersonaService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Persona existing = findById(id);
         repository.delete(existing);
     }

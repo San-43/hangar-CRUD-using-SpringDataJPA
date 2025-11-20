@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-@Component
+// @Component
 public class DataSeeder implements CommandLineRunner {
 
     private final RolRepository rolRepository;

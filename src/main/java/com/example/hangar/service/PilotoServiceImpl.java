@@ -21,12 +21,12 @@ public class PilotoServiceImpl implements PilotoService {
     @Override
     @Transactional(readOnly = true)
     public List<Piloto> findAll() {
-        return repository.findAllWithRolAndTripulaciones();
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Piloto findById(Long id) {
+    public Piloto findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Piloto " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class PilotoServiceImpl implements PilotoService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Piloto existing = findById(id);
         repository.delete(existing);
     }
