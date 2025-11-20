@@ -53,13 +53,13 @@ public class HangarController {
     private TableColumn<Hangar, String> empresaColumn;
 
     @FXML
-    private TextField codigoField;
+    private TextField descripcionField;
 
     @FXML
     private TextField capacidadField;
 
     @FXML
-    private TextField ubicacionField;
+    private TextField areaField;
 
     @FXML
     private ComboBox<Empresa> empresaCombo;
@@ -76,9 +76,10 @@ public class HangarController {
         codigoColumn.setCellValueFactory(new PropertyValueFactory<>("codigo"));
         capacidadColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(
                 cellData.getValue().getCapacidad() != null ? cellData.getValue().getCapacidad() : 0));
-        ubicacionColumn.setCellValueFactory(new PropertyValueFactory<>("ubicacion"));
-        empresaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getEmpresa() != null ? cellData.getValue().getEmpresa().getNombre() : ""));
+        if (ubicacionColumn != null) ubicacionColumn.setCellValueFactory(new PropertyValueFactory<>("area"));
+        if (empresaColumn != null) {
+            empresaColumn.setCellValueFactory(cellData -> new SimpleStringProperty(""));
+        }
 
         populateEmpresas();
         refreshTable();
@@ -95,10 +96,10 @@ public class HangarController {
         }
         Hangar selected = hangarTable.getSelectionModel().getSelectedItem();
         Hangar hangar = selected != null ? hangarService.findById(selected.getId()) : new Hangar();
-        hangar.setCodigo(codigoField.getText().trim());
+        hangar.setDescripcion(descripcionField.getText().trim());
         hangar.setCapacidad(Integer.parseInt(capacidadField.getText().trim()));
-        hangar.setUbicacion(ubicacionField.getText() != null ? ubicacionField.getText().trim() : null);
-        hangar.setEmpresa(empresaCombo.getValue());
+        hangar.setArea(areaField.getText() != null ? areaField.getText().trim() : null);
+        // Hangar no longer has empresa relationship
         hangarService.save(hangar);
         refreshTable();
         clearForm();
@@ -148,13 +149,12 @@ public class HangarController {
             if (hangar == null) {
                 return false;
             }
-            boolean matchesCodigo = hangar.getCodigo() != null && hangar.getCodigo().toLowerCase().contains(normalized);
-            boolean matchesUbicacion = hangar.getUbicacion() != null && hangar.getUbicacion().toLowerCase().contains(normalized);
+            boolean matchesCodigo = hangar.getDescripcion() != null && hangar.getDescripcion().toLowerCase().contains(normalized);
+            boolean matchesUbicacion = hangar.getArea() != null && hangar.getArea().toLowerCase().contains(normalized);
             boolean matchesCapacidad = finalNumericTerm != null && hangar.getCapacidad() != null
                     && hangar.getCapacidad().equals(finalNumericTerm);
-            boolean matchesEmpresa = hangar.getEmpresa() != null && hangar.getEmpresa().getNombre() != null
-                    && hangar.getEmpresa().getNombre().toLowerCase().contains(normalized);
-            return matchesCodigo || matchesUbicacion || matchesCapacidad || matchesEmpresa;
+            // Empresa relationship removed
+            return matchesCodigo || matchesUbicacion || matchesCapacidad;
         });
     }
 
@@ -181,7 +181,7 @@ public class HangarController {
     }
 
     private boolean isFormValid() {
-        if (codigoField == null || codigoField.getText().isBlank()) {
+        if (descripcionField == null || descripcionField.getText().isBlank()) {
             return false;
         }
         if (capacidadField == null || capacidadField.getText().isBlank()) {
@@ -208,18 +208,18 @@ public class HangarController {
             clearForm();
             return;
         }
-        if (codigoField != null) {
-            codigoField.setText(hangar.getCodigo());
+        if (descripcionField != null) {
+            descripcionField.setText(hangar.getDescripcion());
         }
         if (capacidadField != null) {
             capacidadField.setText(hangar.getCapacidad() != null ? String.valueOf(hangar.getCapacidad()) : "");
         }
-        if (ubicacionField != null) {
-            ubicacionField.setText(hangar.getUbicacion());
+        if (areaField != null) {
+            areaField.setText(hangar.getArea());
         }
-        if (empresaCombo != null && hangar.getEmpresa() != null) {
+        if (empresaCombo != null && hangar.getNaves().isEmpty() ? null : null != null) {
             Empresa empresa = empresas.stream()
-                    .filter(e -> e.getId().equals(hangar.getEmpresa().getId()))
+                    .filter(e -> e.getId().equals(hangar.getNaves().isEmpty() ? null : null.getId()))
                     .findFirst()
                     .orElse(null);
             empresaCombo.getSelectionModel().select(empresa);
@@ -227,14 +227,14 @@ public class HangarController {
     }
 
     private void clearForm() {
-        if (codigoField != null) {
-            codigoField.clear();
+        if (descripcionField != null) {
+            descripcionField.clear();
         }
         if (capacidadField != null) {
             capacidadField.clear();
         }
-        if (ubicacionField != null) {
-            ubicacionField.clear();
+        if (areaField != null) {
+            areaField.clear();
         }
         if (empresaCombo != null) {
             empresaCombo.getSelectionModel().clearSelection();

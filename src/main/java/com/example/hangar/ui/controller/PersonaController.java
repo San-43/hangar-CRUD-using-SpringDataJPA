@@ -73,7 +73,7 @@ public class PersonaController {
             apellidosColumn.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
             documentoColumn.setCellValueFactory(new PropertyValueFactory<>("documento"));
             rolColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                    data.getValue().getRol() != null ? data.getValue().getRol().getNombre() : ""));
+                    data.getValue().getRoles().isEmpty() ? null : null != null ? data.getValue().getRoles().isEmpty() ? null : null.getNombre() : ""));
             tripulacionesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
                     data.getValue().getTripulaciones() != null ? data.getValue().getTripulaciones().size() : 0));
             personas.setAll(personaService.findAll());
@@ -110,10 +110,10 @@ public class PersonaController {
 
         Persona selected = personaTable.getSelectionModel().getSelectedItem();
         Persona persona = selected != null ? personaService.findById(selected.getId()) : new Persona();
-        persona.setNombres(nombresField.getText().trim());
-        persona.setApellidos(apellidosField.getText().trim());
-        persona.setDocumento(documentoField.getText().trim());
-        persona.setRol(rolCombo.getValue());
+        persona.setNombre(nombresField.getText().trim());
+        persona.// setApellidos(apellidosField.getText().trim());
+        persona.setCurp(documentoField.getText().trim());
+        persona.// setRol(rolCombo.getValue());
         personaService.save(persona);
         refreshTable();
         clearForm();
@@ -157,15 +157,12 @@ public class PersonaController {
             clearForm();
             return;
         }
-        nombresField.setText(persona.getNombres());
-        apellidosField.setText(persona.getApellidos());
-        documentoField.setText(persona.getDocumento());
-        if (rolCombo != null && persona.getRol() != null) {
-            Rol rol = roles.stream()
-                    .filter(r -> r.getId().equals(persona.getRol().getId()))
-                    .findFirst()
-                    .orElse(null);
-            rolCombo.getSelectionModel().select(rol);
+        nombresField.setText(persona.getNombre());
+        apellidosField.setText(""); // apellidos no longer exists in schema
+        documentoField.setText(persona.getCurp());
+        // Rol relationship changed - persona no longer has direct rol reference
+        if (rolCombo != null) {
+            rolCombo.getSelectionModel().clearSelection();
         }
     }
 
@@ -199,12 +196,10 @@ public class PersonaController {
             if (persona == null) {
                 return false;
             }
-            boolean matchesNombre = persona.getNombres() != null && persona.getNombres().toLowerCase().contains(normalized);
-            boolean matchesApellido = persona.getApellidos() != null && persona.getApellidos().toLowerCase().contains(normalized);
-            boolean matchesDocumento = persona.getDocumento() != null && persona.getDocumento().toLowerCase().contains(normalized);
-            boolean matchesRol = persona.getRol() != null && persona.getRol().getNombre() != null
-                    && persona.getRol().getNombre().toLowerCase().contains(normalized);
-            return matchesNombre || matchesApellido || matchesDocumento || matchesRol;
+            boolean matchesNombre = persona.getNombre() != null && persona.getNombre().toLowerCase().contains(normalized);
+            boolean matchesDocumento = persona.getCurp() != null && persona.getCurp().toLowerCase().contains(normalized);
+            // Rol relationship changed - simplified search
+            return matchesNombre || matchesDocumento;
         });
     }
 

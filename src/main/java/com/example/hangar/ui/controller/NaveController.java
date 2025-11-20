@@ -70,10 +70,9 @@ public class NaveController {
     private TableColumn<Nave, String> hangarColumn;
 
     @FXML
-    private TextField matriculaField;
+    private TextField estadoField;
 
     @FXML
-    private TextField estadoField;
 
     @FXML
     private ComboBox<Modelo> modeloCombo;
@@ -117,7 +116,7 @@ public class NaveController {
         }
         Nave selected = naveTable.getSelectionModel().getSelectedItem();
         Nave nave = selected != null ? naveService.findById(selected.getId()) : new Nave();
-        nave.setMatricula(matriculaField.getText().trim());
+        nave.setEstado(estadoField != null ? estadoField.getText().trim() : null);
         nave.setEstado(estadoField.getText().trim());
         nave.setModelo(modeloCombo.getValue());
         nave.setEmpresa(empresaCombo.getValue());
@@ -173,14 +172,14 @@ public class NaveController {
             if (nave == null) {
                 return false;
             }
-            boolean matchesMatricula = nave.getMatricula() != null && nave.getMatricula().toLowerCase().contains(normalized);
+            boolean matchesMatricula = nave.getEstado() != null && nave.getEstado().toLowerCase().contains(normalized);
             boolean matchesEstado = nave.getEstado() != null && nave.getEstado().toLowerCase().contains(normalized);
             return matchesMatricula || matchesEstado;
         });
     }
 
     private boolean isFormValid() {
-        return matriculaField != null && !matriculaField.getText().isBlank()
+        return estadoField != null && !estadoField.getText().isBlank()
                 && estadoField != null && !estadoField.getText().isBlank()
                 && modeloCombo != null && modeloCombo.getValue() != null
                 && empresaCombo != null && empresaCombo.getValue() != null
@@ -198,7 +197,7 @@ public class NaveController {
             clearForm();
             return;
         }
-        matriculaField.setText(nave.getMatricula());
+        estadoField.setText(nave.getEstado());
         estadoField.setText(nave.getEstado());
         if (modeloCombo != null && nave.getModelo() != null) {
             Modelo modelo = modelos.stream()
@@ -224,8 +223,8 @@ public class NaveController {
     }
 
     private void clearForm() {
-        if (matriculaField != null) {
-            matriculaField.clear();
+        if (estadoField != null) {
+            estadoField.clear();
         }
         if (estadoField != null) {
             estadoField.clear();

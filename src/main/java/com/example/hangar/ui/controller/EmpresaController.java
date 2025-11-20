@@ -29,16 +29,19 @@ public class EmpresaController {
     private TableView<Empresa> empresaTable;
 
     @FXML
-    private TableColumn<Empresa, Long> idColumn;
+    private TableColumn<Empresa, Integer> idColumn;
 
     @FXML
     private TableColumn<Empresa, String> nombreColumn;
 
     @FXML
-    private TableColumn<Empresa, String> paisColumn;
+    private TableColumn<Empresa, String> contactoColumn;
 
     @FXML
-    private TableColumn<Empresa, Number> hangaresColumn;
+    private TableColumn<Empresa, String> ubicacionColumn;
+
+    @FXML
+    private TableColumn<Empresa, String> rfcColumn;
 
     @FXML
     private TableColumn<Empresa, Number> navesColumn;
@@ -47,7 +50,13 @@ public class EmpresaController {
     private TextField nombreField;
 
     @FXML
-    private TextField paisField;
+    private TextField contactoField;
+
+    @FXML
+    private TextField ubicacionField;
+
+    @FXML
+    private TextField rfcField;
 
     @FXML
     private TextField searchField;
@@ -57,11 +66,13 @@ public class EmpresaController {
         if (empresaTable != null) {
             idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-            paisColumn.setCellValueFactory(new PropertyValueFactory<>("pais"));
-            hangaresColumn.setCellValueFactory(cellData ->
-                    new SimpleIntegerProperty(cellData.getValue().getHangares().size()));
-            navesColumn.setCellValueFactory(cellData ->
-                    new SimpleIntegerProperty(cellData.getValue().getNaves().size()));
+            if (contactoColumn != null) contactoColumn.setCellValueFactory(new PropertyValueFactory<>("contacto"));
+            if (ubicacionColumn != null) ubicacionColumn.setCellValueFactory(new PropertyValueFactory<>("ubicacion"));
+            if (rfcColumn != null) rfcColumn.setCellValueFactory(new PropertyValueFactory<>("rfc"));
+            if (navesColumn != null) {
+                navesColumn.setCellValueFactory(cellData ->
+                        new SimpleIntegerProperty(cellData.getValue().getNaves().size()));
+            }
             empresas.setAll(empresaService.findAll());
             empresaTable.setItems(filteredEmpresas);
             empresaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
@@ -71,13 +82,15 @@ public class EmpresaController {
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Nombre y país son obligatorios.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "El nombre es obligatorio.");
             return;
         }
         Empresa selected = empresaTable.getSelectionModel().getSelectedItem();
         Empresa empresa = selected != null ? empresaService.findById(selected.getId()) : new Empresa();
         empresa.setNombre(nombreField.getText().trim());
-        empresa.setPais(paisField.getText().trim());
+        if (contactoField != null) empresa.setContacto(contactoField.getText().trim());
+        if (ubicacionField != null) empresa.setUbicacion(ubicacionField.getText().trim());
+        if (rfcField != null) empresa.setRfc(rfcField.getText().trim());
         empresaService.save(empresa);
         refreshTable();
         clearForm();
@@ -128,16 +141,16 @@ public class EmpresaController {
                 return false;
             }
             boolean matchesNombre = empresa.getNombre() != null && empresa.getNombre().toLowerCase().contains(normalized);
-            boolean matchesPais = empresa.getPais() != null && empresa.getPais().toLowerCase().contains(normalized);
-            boolean matchesHangares = finalNumericTerm != null && empresa.getHangares().size() == finalNumericTerm;
+            boolean matchesContacto = empresa.getContacto() != null && empresa.getContacto().toLowerCase().contains(normalized);
+            boolean matchesUbicacion = empresa.getUbicacion() != null && empresa.getUbicacion().toLowerCase().contains(normalized);
+            boolean matchesRfc = empresa.getRfc() != null && empresa.getRfc().toLowerCase().contains(normalized);
             boolean matchesNaves = finalNumericTerm != null && empresa.getNaves().size() == finalNumericTerm;
-            return matchesNombre || matchesPais || matchesHangares || matchesNaves;
+            return matchesNombre || matchesContacto || matchesUbicacion || matchesRfc || matchesNaves;
         });
     }
 
     private boolean isFormValid() {
-        return nombreField != null && !nombreField.getText().isBlank()
-                && paisField != null && !paisField.getText().isBlank();
+        return nombreField != null && !nombreField.getText().isBlank();
     }
 
     private void refreshTable() {
@@ -152,15 +165,23 @@ public class EmpresaController {
             return;
         }
         nombreField.setText(empresa.getNombre());
-        paisField.setText(empresa.getPais());
+        if (contactoField != null && empresa.getContacto() != null) contactoField.setText(empresa.getContacto());
+        if (ubicacionField != null && empresa.getUbicacion() != null) ubicacionField.setText(empresa.getUbicacion());
+        if (rfcField != null && empresa.getRfc() != null) rfcField.setText(empresa.getRfc());
     }
 
     private void clearForm() {
         if (nombreField != null) {
             nombreField.clear();
         }
-        if (paisField != null) {
-            paisField.clear();
+        if (contactoField != null) {
+            contactoField.clear();
+        }
+        if (ubicacionField != null) {
+            ubicacionField.clear();
+        }
+        if (rfcField != null) {
+            rfcField.clear();
         }
     }
 

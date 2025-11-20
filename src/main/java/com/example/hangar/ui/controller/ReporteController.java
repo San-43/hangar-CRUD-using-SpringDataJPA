@@ -68,7 +68,7 @@ public class ReporteController {
     private TableColumn<Reporte, String> naveColumn;
 
     @FXML
-    private TextField tituloField;
+    private TextField diagnosticoField;
 
     @FXML
     private TextArea descripcionArea;
@@ -113,8 +113,8 @@ public class ReporteController {
         }
         Reporte selected = reporteTable.getSelectionModel().getSelectedItem();
         Reporte reporte = selected != null ? reporteService.findById(selected.getId()) : new Reporte();
-        reporte.setTitulo(tituloField.getText().trim());
-        reporte.setDescripcion(descripcionArea.getText() != null ? descripcionArea.getText().trim() : "");
+        reporte. setDiagnostico(diagnosticoField.getText().trim());
+        reporte. setAcciones_realizadas(descripcionArea.getText() != null ? descripcionArea.getText().trim() : "");
         reporte.setTaller(tallerCombo.getValue());
         reporte.setNave(naveCombo.getValue());
         if (reporte.getId() == null) {
@@ -168,14 +168,14 @@ public class ReporteController {
             if (reporte == null) {
                 return false;
             }
-            boolean matchesTitulo = reporte.getTitulo() != null && reporte.getTitulo().toLowerCase().contains(normalized);
-            boolean matchesDescripcion = reporte.getDescripcion() != null && reporte.getDescripcion().toLowerCase().contains(normalized);
+            boolean matchesTitulo = reporte.getDiagnostico() != null && reporte.getDiagnostico().toLowerCase().contains(normalized);
+            boolean matchesDescripcion = reporte.getAcciones_realizadas() != null && reporte.getAcciones_realizadas().toLowerCase().contains(normalized);
             return matchesTitulo || matchesDescripcion;
         });
     }
 
     private boolean isFormValid() {
-        return tituloField != null && !tituloField.getText().isBlank()
+        return diagnosticoField != null && !diagnosticoField.getText().isBlank()
                 && tallerCombo != null && tallerCombo.getValue() != null
                 && naveCombo != null && naveCombo.getValue() != null;
     }
@@ -191,8 +191,8 @@ public class ReporteController {
             clearForm();
             return;
         }
-        tituloField.setText(reporte.getTitulo());
-        descripcionArea.setText(reporte.getDescripcion());
+        diagnosticoField.setText(reporte.getDiagnostico());
+        descripcionArea.setText(reporte.getAcciones_realizadas());
         if (tallerCombo != null && reporte.getTaller() != null) {
             Taller taller = talleres.stream()
                     .filter(t -> t.getId().equals(reporte.getTaller().getId()))
@@ -210,8 +210,8 @@ public class ReporteController {
     }
 
     private void clearForm() {
-        if (tituloField != null) {
-            tituloField.clear();
+        if (diagnosticoField != null) {
+            diagnosticoField.clear();
         }
         if (descripcionArea != null) {
             descripcionArea.clear();

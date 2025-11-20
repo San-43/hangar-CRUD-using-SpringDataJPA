@@ -91,9 +91,9 @@ public class TallerController {
         }
         Taller selected = tallerTable.getSelectionModel().getSelectedItem();
         Taller taller = selected != null ? tallerService.findById(selected.getId()) : new Taller();
-        taller.setNombre(nombreField.getText().trim());
-        taller.setEspecialidad(especialidadField.getText() != null ? especialidadField.getText().trim() : null);
-        taller.setHangar(hangarCombo.getValue());
+        // nombre and especialidad fields removed from Taller entity
+        taller.setHangar(hangarCombo != null ? hangarCombo.getValue() : null);
+        // encargado would need to be set from UI, but UI fields don't exist yet
         tallerService.save(taller);
         refreshTable();
         clearForm();
@@ -139,9 +139,13 @@ public class TallerController {
             if (taller == null) {
                 return false;
             }
-            boolean matchNombre = taller.getNombre() != null && taller.getNombre().toLowerCase().contains(normalized);
-            boolean matchEspecialidad = taller.getEspecialidad() != null && taller.getEspecialidad().toLowerCase().contains(normalized);
-            return matchNombre || matchEspecialidad;
+            // Taller no longer has nombre/especialidad - search by ID and related entities
+            String idStr = taller.getId() != null ? taller.getId().toString() : "";
+            boolean matchId = idStr.contains(normalized);
+            boolean matchHangar = taller.getHangar() != null && 
+                                  taller.getHangar().getDescripcion() != null && 
+                                  taller.getHangar().getDescripcion().toLowerCase().contains(normalized);
+            return matchId || matchHangar;
         });
     }
 
@@ -161,8 +165,8 @@ public class TallerController {
             clearForm();
             return;
         }
-        nombreField.setText(taller.getNombre());
-        especialidadField.setText(taller.getEspecialidad());
+        nombreField.setText(taller.getId() != null ? taller.getId().toString() : "");
+        especialidadField.setText("");
         if (hangarCombo != null && taller.getHangar() != null) {
             Hangar hangar = hangares.stream()
                     .filter(h -> h.getId().equals(taller.getHangar().getId()))

@@ -44,10 +44,10 @@ public class ModeloController {
     private TableColumn<Modelo, Number> navesColumn;
 
     @FXML
-    private TextField nombreField;
+    private TextField pesoField;
 
     @FXML
-    private TextField fabricanteField;
+    private TextField paisFabricacionField;
 
     @FXML
     private TextField capacidadField;
@@ -78,20 +78,20 @@ public class ModeloController {
         }
         Modelo selected = modeloTable.getSelectionModel().getSelectedItem();
         Modelo modelo = selected != null ? modeloService.findById(selected.getId()) : new Modelo();
-        modelo.setNombre(nombreField.getText().trim());
-        modelo.setFabricante(fabricanteField.getText().trim());
-
-        // Validar y establecer capacidad
-        String capacidadText = capacidadField.getText().trim();
-        if (!capacidadText.isEmpty()) {
+        
+        // Parse peso from field
+        String pesoText = pesoField.getText().trim();
+        if (!pesoText.isEmpty()) {
             try {
-                modelo.setCapacidad(Integer.parseInt(capacidadText));
+                modelo.setPeso(Integer.parseInt(pesoText));
             } catch (NumberFormatException e) {
-                showAlert(Alert.AlertType.WARNING, "Formato incorrecto", "La capacidad debe ser un número entero.");
+                showAlert(Alert.AlertType.WARNING, "Formato incorrecto", "El peso debe ser un número entero.");
                 return;
             }
-        } else {
-            modelo.setCapacidad(null);
+        }
+        
+        if (paisFabricacionField != null && !paisFabricacionField.getText().trim().isEmpty()) {
+            modelo.setPais_fabricacion(paisFabricacionField.getText().trim());
         }
 
         modeloService.save(modelo);
@@ -160,16 +160,16 @@ public class ModeloController {
             if (modelo == null) {
                 return false;
             }
-            boolean matchesNombre = modelo.getNombre() != null && modelo.getNombre().toLowerCase().contains(normalized);
-            boolean matchesFabricante = modelo.getFabricante() != null && modelo.getFabricante().toLowerCase().contains(normalized);
-            boolean matchesCapacidad = finalNumericTerm != null && modelo.getCapacidad() != null && modelo.getCapacidad().equals(finalNumericTerm);
+            boolean matchesNombre = modelo.getPeso() != null && modelo.getPeso().toLowerCase().contains(normalized);
+            boolean matchesFabricante = modelo.getPais_fabricacion() != null && modelo.getPais_fabricacion().toLowerCase().contains(normalized);
+            boolean matchesCapacidad = finalNumericTerm != null && modelo0 != null && modelo0.equals(finalNumericTerm);
             boolean matchesNaves = finalNumericTerm != null && modelo.getNaves().size() == finalNumericTerm;
             return matchesNombre || matchesFabricante || matchesCapacidad || matchesNaves;
         });
     }
 
     private boolean isFormValid() {
-        return nombreField != null && !nombreField.getText().isBlank();
+        return pesoField != null && !pesoField.getText().isBlank();
     }
 
     private void refreshTable() {
@@ -183,17 +183,17 @@ public class ModeloController {
             clearForm();
             return;
         }
-        nombreField.setText(modelo.getNombre());
-        fabricanteField.setText(modelo.getFabricante());
-        capacidadField.setText(modelo.getCapacidad() != null ? modelo.getCapacidad().toString() : "");
+        pesoField.setText(modelo.getPeso());
+        paisFabricacionField.setText(modelo.getPais_fabricacion());
+        capacidadField.setText(modelo0 != null ? modelo0.toString() : "");
     }
 
     private void clearForm() {
-        if (nombreField != null) {
-            nombreField.clear();
+        if (pesoField != null) {
+            pesoField.clear();
         }
-        if (fabricanteField != null) {
-            fabricanteField.clear();
+        if (paisFabricacionField != null) {
+            paisFabricacionField.clear();
         }
         if (capacidadField != null) {
             capacidadField.clear();
