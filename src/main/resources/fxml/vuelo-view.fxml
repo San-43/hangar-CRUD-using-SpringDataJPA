@@ -45,6 +45,7 @@
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
                 <Button text="Eliminar" onAction="#onEliminar" />
                 <Button text="Limpiar" onAction="#onLimpiar" />
+                <Button text="Verificar Tripulación" onAction="#onVerificarTripulacion" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField" promptText="Buscar por origen o destino" HBox.hgrow="ALWAYS" />

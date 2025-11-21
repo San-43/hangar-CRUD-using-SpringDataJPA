@@ -91,30 +91,30 @@ public class TripulacionController {
         Vuelo vueloSeleccionado = vueloCombo.getValue();
         Persona personaSeleccionada = personaCombo.getValue();
         String rolSeleccionado = rolCombo.getValue();
+        Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
+        Integer idTripulacionActual = selected != null ? selected.getIdTripulacion() : null;
 
-        // Validar que solo haya un Capitán por vuelo
-        if ("Capitán".equals(rolSeleccionado)) {
-            Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
-            Integer idTripulacionActual = selected != null ? selected.getIdTripulacion() : null;
+        // Validaciones de roles únicos
+        try {
+            validarRolUnico(vueloSeleccionado.getIdVuelo(), rolSeleccionado, idTripulacionActual);
+        } catch (IllegalArgumentException e) {
+            showAlert(Alert.AlertType.ERROR, "Validación fallida", e.getMessage());
+            return;
+        }
 
-            // Contar capitanes existentes en este vuelo (excluyendo el actual si es edición)
-            List<Tripulacion> tripulacionesVuelo = tripulacionService.findAll().stream()
-                .filter(t -> t.getVuelo() != null && t.getVuelo().getIdVuelo().equals(vueloSeleccionado.getIdVuelo()))
-                .toList();
-            long capitanesExistentes = tripulacionesVuelo.stream()
-                .filter(t -> "Capitán".equals(t.getRolTripulacion()))
-                .filter(t -> idTripulacionActual == null || !t.getIdTripulacion().equals(idTripulacionActual))
-                .count();
-
-            if (capitanesExistentes > 0) {
-                showAlert(Alert.AlertType.ERROR, "Validación fallida",
-                    "Este vuelo ya tiene un Capitán. Solo puede haber un Capitán por vuelo.");
-                return;
-            }
+        // Validar que la persona no esté duplicada en el vuelo
+        try {
+            tripulacionService.validarPersonaUnicaPorVuelo(
+                vueloSeleccionado.getIdVuelo(),
+                personaSeleccionada.getIdPersona(),
+                idTripulacionActual
+            );
+        } catch (IllegalArgumentException e) {
+            showAlert(Alert.AlertType.ERROR, "Validación fallida", e.getMessage());
+            return;
         }
 
         try {
-            Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
             Tripulacion tripulacion;
 
             if (selected != null) {
@@ -275,6 +275,35 @@ public class TripulacionController {
         if (vueloCombo != null) vueloCombo.setValue(null);
         if (personaCombo != null) personaCombo.setValue(null);
         if (rolCombo != null) rolCombo.setValue(null);
+    }
+
+    /**
+     * Valida que ciertos roles sean únicos por vuelo.
+     * Capitán, Copiloto e Ingeniero de Vuelo pueden tener solo 1 por vuelo.
+     */
+    private void validarRolUnico(Integer idVuelo, String rol, Integer idTripulacionActual) {
+        List<String> rolesUnicos = Arrays.asList("Capitán", "Copiloto", "Ingeniero de Vuelo");
+
+        if (!rolesUnicos.contains(rol)) {
+            // Los Auxiliares de Vuelo pueden ser múltiples
+            return;
+        }
+
+        // Contar existentes en este vuelo (excluyendo el actual si es edición)
+        List<Tripulacion> tripulacionesVuelo = tripulacionService.findAll().stream()
+            .filter(t -> t.getVuelo() != null && t.getVuelo().getIdVuelo().equals(idVuelo))
+            .toList();
+
+        long rolesExistentes = tripulacionesVuelo.stream()
+            .filter(t -> rol.equals(t.getRolTripulacion()))
+            .filter(t -> idTripulacionActual == null || !t.getIdTripulacion().equals(idTripulacionActual))
+            .count();
+
+        if (rolesExistentes > 0) {
+            throw new IllegalArgumentException(
+                "Este vuelo ya tiene un " + rol + ". Solo puede haber un " + rol + " por vuelo."
+            );
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

@@ -3,7 +3,9 @@ package com.example.hangar.ui.controller;
 import com.example.hangar.model.Nave;
 import com.example.hangar.model.Vuelo;
 import com.example.hangar.service.NaveService;
+import com.example.hangar.service.TripulacionService;
 import com.example.hangar.service.VueloService;
+import com.example.hangar.util.TripulacionValidator;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,13 +25,15 @@ public class VueloController {
 
     private final VueloService vueloService;
     private final NaveService naveService;
+    private final TripulacionService tripulacionService;
     private final ObservableList<Vuelo> vuelos = FXCollections.observableArrayList();
     private final FilteredList<Vuelo> filteredVuelos = new FilteredList<>(vuelos, vuelo -> true);
     private final ObservableList<Nave> naves = FXCollections.observableArrayList();
 
-    public VueloController(VueloService vueloService, NaveService naveService) {
+    public VueloController(VueloService vueloService, NaveService naveService, TripulacionService tripulacionService) {
         this.vueloService = vueloService;
         this.naveService = naveService;
+        this.tripulacionService = tripulacionService;
     }
 
     @FXML private TableView<Vuelo> vueloTable;
@@ -241,5 +245,36 @@ public class VueloController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-}
 
+    @FXML
+    private void onVerificarTripulacion() {
+        Vuelo selected = vueloTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Seleccione un vuelo",
+                "Debe seleccionar un vuelo para verificar su tripulación.");
+            return;
+        }
+
+        try {
+            var tripulaciones = tripulacionService.findAll().stream()
+                .filter(t -> t.getVuelo() != null && t.getVuelo().getIdVuelo().equals(selected.getIdVuelo()))
+                .toList();
+
+            TripulacionValidator.TripulacionValidationResult resultado = TripulacionValidator.validar(tripulaciones);
+
+            if (resultado.isValid) {
+                showAlert(Alert.AlertType.INFORMATION, "Tripulación válida", resultado.message);
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Tripulación incompleta",
+                    resultado.message + "\n\nRequerimientos:\n" +
+                    "- Capitán: 1 (encontrado: " + resultado.capitanes + ")\n" +
+                    "- Copiloto: 1 (encontrado: " + resultado.copilotos + ")\n" +
+                    "- Ingeniero de Vuelo: 1 (encontrado: " + resultado.ingenieros + ")\n" +
+                    "- Auxiliares de Vuelo: ≥2 (encontrados: " + resultado.auxiliares + ")");
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error",
+                "Ocurrió un error al verificar la tripulación: " + e.getMessage());
+        }
+    }
+}
