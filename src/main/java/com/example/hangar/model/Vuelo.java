@@ -17,39 +17,53 @@ public class Vuelo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_vuelo")
+    private Integer idVuelo;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String codigo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_nave")
+    private Nave nave;
 
-    @Column(length = 120)
+    @Column(length = 100)
+    private String origen;
+
+    @Column(length = 100)
     private String destino;
 
     @Column(name = "fecha_salida")
     private LocalDateTime fechaSalida;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nave_id")
-    private Nave nave;
+    @Column(name = "fecha_llegada")
+    private LocalDateTime fechaLlegada;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tripulacion_id")
-    private Tripulacion tripulacion;
+    @Column
+    private Integer pasajeros;
 
-    public Long getId() {
-        return id;
+    @Column
+    private Integer distancia;
+
+    public Integer getIdVuelo() {
+        return idVuelo;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdVuelo(Integer idVuelo) {
+        this.idVuelo = idVuelo;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public Nave getNave() {
+        return nave;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setNave(Nave nave) {
+        this.nave = nave;
+    }
+
+    public String getOrigen() {
+        return origen;
+    }
+
+    public void setOrigen(String origen) {
+        this.origen = origen;
     }
 
     public String getDestino() {
@@ -68,19 +82,27 @@ public class Vuelo {
         this.fechaSalida = fechaSalida;
     }
 
-    public Nave getNave() {
-        return nave;
+    public LocalDateTime getFechaLlegada() {
+        return fechaLlegada;
     }
 
-    public void setNave(Nave nave) {
-        this.nave = nave;
+    public void setFechaLlegada(LocalDateTime fechaLlegada) {
+        this.fechaLlegada = fechaLlegada;
     }
 
-    public Tripulacion getTripulacion() {
-        return tripulacion;
+    public Integer getPasajeros() {
+        return pasajeros;
     }
 
-    public void setTripulacion(Tripulacion tripulacion) {
-        this.tripulacion = tripulacion;
+    public void setPasajeros(Integer pasajeros) {
+        this.pasajeros = pasajeros;
+    }
+
+    public Integer getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(Integer distancia) {
+        this.distancia = distancia;
     }
 }

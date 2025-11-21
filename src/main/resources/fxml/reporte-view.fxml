@@ -2,6 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -10,7 +11,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.ReporteController">
@@ -21,17 +21,26 @@
             </padding>
             <Label text="Gestión de reportes" styleClass="title" />
             <GridPane hgap="10" vgap="8">
-                <Label text="Título" />
-                <TextField fx:id="tituloField" promptText="Título del reporte" GridPane.columnIndex="1" />
+                <Label text="Nave" />
+                <ComboBox fx:id="naveCombo" promptText="Seleccione una nave" GridPane.columnIndex="1" />
 
-                <Label text="Descripción" GridPane.rowIndex="1" />
-                <TextArea fx:id="descripcionArea" promptText="Descripción detallada" GridPane.columnIndex="1" GridPane.rowIndex="1" prefRowCount="3" />
+                <Label text="Taller" GridPane.rowIndex="1" />
+                <ComboBox fx:id="tallerCombo" promptText="Seleccione un taller" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Taller" GridPane.rowIndex="2" />
-                <ComboBox fx:id="tallerCombo" promptText="Seleccione un taller" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Encargado" GridPane.rowIndex="2" />
+                <ComboBox fx:id="encargadoCombo" promptText="Seleccione un encargado" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="Nave" GridPane.rowIndex="3" />
-                <ComboBox fx:id="naveCombo" promptText="Seleccione una nave" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="Diagnóstico" GridPane.rowIndex="3" />
+                <TextArea fx:id="diagnosticoArea" promptText="Diagnóstico del problema" GridPane.columnIndex="1" GridPane.rowIndex="3" prefRowCount="3" />
+
+                <Label text="Acciones realizadas" GridPane.rowIndex="4" />
+                <TextArea fx:id="accionesRealizadasArea" promptText="Acciones de reparación" GridPane.columnIndex="1" GridPane.rowIndex="4" prefRowCount="3" />
+
+                <Label text="Fecha" GridPane.rowIndex="5" />
+                <DatePicker fx:id="fechaPicker" promptText="Fecha del reporte" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                <Label text="Costo" GridPane.rowIndex="6" />
+                <TextField fx:id="costoField" promptText="Costo en pesos" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -39,7 +48,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por título o descripción" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por diagnóstico, acciones o encargado" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -47,12 +56,12 @@
     <center>
         <TableView fx:id="reporteTable">
             <columns>
-                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                <TableColumn fx:id="tituloColumn" text="Título" prefWidth="200" />
-                <TableColumn fx:id="descripcionColumn" text="Descripción" prefWidth="250" />
-                <TableColumn fx:id="fechaColumn" text="Fecha Registro" prefWidth="150" />
-                <TableColumn fx:id="tallerColumn" text="Taller" prefWidth="150" />
-                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="150" />
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="120" />
+                <TableColumn fx:id="tallerColumn" text="Taller" prefWidth="120" />
+                <TableColumn fx:id="encargadoColumn" text="Encargado" prefWidth="150" />
+                <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="120" />
+                <TableColumn fx:id="costoColumn" text="Costo" prefWidth="100" />
             </columns>
         </TableView>
     </center>

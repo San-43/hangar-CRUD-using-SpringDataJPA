@@ -21,35 +21,32 @@ public class ModeloServiceImpl implements ModeloService {
     @Override
     @Transactional(readOnly = true)
     public List<Modelo> findAll() {
-        List<Modelo> modelos = repository.findAll();
-        modelos.forEach(this::initializeAssociations);
-        return modelos;
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Modelo findById(Long id) {
-        Modelo modelo = repository.findById(id)
+    public Modelo findById(Integer id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Modelo " + id + " no existe"));
-        initializeAssociations(modelo);
-        return modelo;
     }
 
     @Override
     public Modelo save(Modelo entity) {
+        if (entity.getNombreModelo() == null || entity.getNombreModelo().isBlank()) {
+            throw new IllegalArgumentException("El nombre del modelo es obligatorio");
+        }
+        // Validar unicidad (si es nuevo o cambia el nombre)
+        boolean nombreExiste = repository.existsByNombreModeloIgnoreCase(entity.getNombreModelo());
+        if (nombreExiste && (entity.getIdModelo() == null)) {
+            throw new IllegalArgumentException("Ya existe un modelo con ese nombre");
+        }
         return repository.save(entity);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Modelo existing = findById(id);
         repository.delete(existing);
-    }
-
-    private void initializeAssociations(Modelo modelo) {
-        if (modelo == null) {
-            return;
-        }
-        modelo.getNaves().size();
     }
 }

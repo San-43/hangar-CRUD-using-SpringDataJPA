@@ -8,11 +8,11 @@ public interface PilotoService {
 
     List<Piloto> findAll();
 
-    Piloto findById(Long id);
+    Piloto findById(Integer id);
 
     Piloto save(Piloto entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
 }

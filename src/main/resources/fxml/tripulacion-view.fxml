@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -10,7 +10,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.TripulacionController">
@@ -25,11 +24,14 @@
                     <ColumnConstraints minWidth="120" halignment="RIGHT" />
                     <ColumnConstraints hgrow="ALWAYS" percentWidth="100" />
                 </columnConstraints>
-                <Label text="Nombre" />
-                <TextField fx:id="nombreField" promptText="Nombre de la tripulación" GridPane.columnIndex="1" />
+                <Label text="Vuelo" />
+                <ComboBox fx:id="vueloCombo" promptText="Seleccione un vuelo" GridPane.columnIndex="1" />
 
-                <Label text="Integrantes" GridPane.rowIndex="1" />
-                <ListView fx:id="integrantesList" prefHeight="160" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Persona" GridPane.rowIndex="1" />
+                <ComboBox fx:id="personaCombo" promptText="Seleccione una persona" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Rol" GridPane.rowIndex="2" />
+                <ComboBox fx:id="rolCombo" promptText="Seleccione un rol" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -37,7 +39,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por nombre" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por persona o rol" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -46,9 +48,9 @@
         <TableView fx:id="tripulacionTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="240" />
-                <TableColumn fx:id="integrantesColumn" text="# Integrantes" prefWidth="140" />
-                <TableColumn fx:id="vuelosColumn" text="# Vuelos" prefWidth="120" />
+                <TableColumn fx:id="vueloColumn" text="Vuelo" prefWidth="220" />
+                <TableColumn fx:id="personaColumn" text="Persona" prefWidth="220" />
+                <TableColumn fx:id="rolColumn" text="Rol" prefWidth="180" />
             </columns>
         </TableView>
     </center>

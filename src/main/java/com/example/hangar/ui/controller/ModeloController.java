@@ -6,17 +6,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.beans.property.SimpleIntegerProperty;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ModeloController {
-
     private final ModeloService modeloService;
     private final ObservableList<Modelo> modelos = FXCollections.observableArrayList();
     private final FilteredList<Modelo> filteredModelos = new FilteredList<>(modelos, modelo -> true);
@@ -25,45 +20,26 @@ public class ModeloController {
         this.modeloService = modeloService;
     }
 
-    @FXML
-    private TableView<Modelo> modeloTable;
-
-    @FXML
-    private TableColumn<Modelo, Long> idColumn;
-
-    @FXML
-    private TableColumn<Modelo, String> nombreColumn;
-
-    @FXML
-    private TableColumn<Modelo, String> fabricanteColumn;
-
-    @FXML
-    private TableColumn<Modelo, Integer> capacidadColumn;
-
-    @FXML
-    private TableColumn<Modelo, Number> navesColumn;
-
-    @FXML
-    private TextField nombreField;
-
-    @FXML
-    private TextField fabricanteField;
-
-    @FXML
-    private TextField capacidadField;
-
-    @FXML
-    private TextField searchField;
+    @FXML private TableView<Modelo> modeloTable;
+    @FXML private TableColumn<Modelo, Integer> idColumn;
+    @FXML private TableColumn<Modelo, String> nombreColumn;
+    @FXML private TableColumn<Modelo, Integer> pesoColumn;
+    @FXML private TableColumn<Modelo, Integer> capacidadColumn;
+    @FXML private TableColumn<Modelo, String> paisFabricacionColumn;
+    @FXML private TextField nombreField;
+    @FXML private TextField pesoField;
+    @FXML private TextField capacidadField;
+    @FXML private TextField paisFabricacionField;
+    @FXML private TextField searchField;
 
     @FXML
     public void initialize() {
         if (modeloTable != null) {
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-            fabricanteColumn.setCellValueFactory(new PropertyValueFactory<>("fabricante"));
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("idModelo"));
+            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombreModelo"));
+            pesoColumn.setCellValueFactory(new PropertyValueFactory<>("peso"));
             capacidadColumn.setCellValueFactory(new PropertyValueFactory<>("capacidad"));
-            navesColumn.setCellValueFactory(cellData ->
-                    new SimpleIntegerProperty(cellData.getValue().getNaves().size()));
+            paisFabricacionColumn.setCellValueFactory(new PropertyValueFactory<>("paisFabricacion"));
             modelos.setAll(modeloService.findAll());
             modeloTable.setItems(filteredModelos);
             modeloTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
@@ -73,15 +49,26 @@ public class ModeloController {
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Nombre es obligatorio.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "El nombre, peso y capacidad del modelo son obligatorios.");
             return;
         }
         Modelo selected = modeloTable.getSelectionModel().getSelectedItem();
-        Modelo modelo = selected != null ? modeloService.findById(selected.getId()) : new Modelo();
-        modelo.setNombre(nombreField.getText().trim());
-        modelo.setFabricante(fabricanteField.getText().trim());
+        Modelo modelo = selected != null ? modeloService.findById(selected.getIdModelo()) : new Modelo();
 
-        // Validar y establecer capacidad
+        modelo.setNombreModelo(nombreField.getText().trim());
+
+        String pesoText = pesoField.getText().trim();
+        if (!pesoText.isEmpty()) {
+            try {
+                modelo.setPeso(Integer.parseInt(pesoText));
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.WARNING, "Formato incorrecto", "El peso debe ser un número entero.");
+                return;
+            }
+        } else {
+            modelo.setPeso(null);
+        }
+
         String capacidadText = capacidadField.getText().trim();
         if (!capacidadText.isEmpty()) {
             try {
@@ -94,10 +81,18 @@ public class ModeloController {
             modelo.setCapacidad(null);
         }
 
-        modeloService.save(modelo);
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Éxito", "El modelo ha sido guardado correctamente.");
+        modelo.setPaisFabricacion(paisFabricacionField.getText().trim());
+
+        try {
+            modeloService.save(modelo);
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Éxito", "El modelo ha sido guardado correctamente.");
+        } catch (IllegalArgumentException e) {
+            showAlert(Alert.AlertType.ERROR, "Error de validación", e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al guardar el modelo: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -107,24 +102,14 @@ public class ModeloController {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir un modelo para eliminarlo.");
             return;
         }
-
-        // Validar si el modelo tiene naves asociadas
-        if (selected.getNaves() != null && !selected.getNaves().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "No se puede eliminar",
-                    "Este modelo tiene " + selected.getNaves().size() + " nave(s) asociada(s). " +
-                    "Primero debe eliminar o reasignar las naves relacionadas.");
-            return;
-        }
-
         try {
-            modeloService.delete(selected.getId());
+            modeloService.delete(selected.getIdModelo());
             refreshTable();
             clearForm();
             showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El modelo seleccionado fue eliminado.");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
-                    "No se puede eliminar este modelo porque tiene naves asociadas. " +
-                    "Primero debe eliminar o reasignar las naves relacionadas.");
+                    "No se puede eliminar este modelo porque tiene naves, pilotos u otros registros asociados.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el modelo: " + e.getMessage());
         }
@@ -133,43 +118,37 @@ public class ModeloController {
     @FXML
     private void onLimpiar() {
         clearForm();
-        if (modeloTable != null) {
-            modeloTable.getSelectionModel().clearSelection();
-        }
+        if (modeloTable != null) modeloTable.getSelectionModel().clearSelection();
     }
 
     @FXML
     private void onBuscar() {
-        if (searchField == null) {
-            return;
-        }
+        if (searchField == null) return;
         String term = searchField.getText();
         if (term == null || term.isBlank()) {
-            filteredModelos.setPredicate(modelo -> true);
+            filteredModelos.setPredicate(m -> true);
             return;
         }
         String normalized = term.trim().toLowerCase();
         Integer numericTerm = null;
         try {
             numericTerm = Integer.parseInt(term.trim());
-        } catch (NumberFormatException ignored) {
-            // El término de búsqueda no es numérico.
-        }
+        } catch (NumberFormatException ignored) {}
         Integer finalNumericTerm = numericTerm;
         filteredModelos.setPredicate(modelo -> {
-            if (modelo == null) {
-                return false;
-            }
-            boolean matchesNombre = modelo.getNombre() != null && modelo.getNombre().toLowerCase().contains(normalized);
-            boolean matchesFabricante = modelo.getFabricante() != null && modelo.getFabricante().toLowerCase().contains(normalized);
+            if (modelo == null) return false;
+            boolean matchesNombre = modelo.getNombreModelo() != null && modelo.getNombreModelo().toLowerCase().contains(normalized);
+            boolean matchesPais = modelo.getPaisFabricacion() != null && modelo.getPaisFabricacion().toLowerCase().contains(normalized);
+            boolean matchesPeso = finalNumericTerm != null && modelo.getPeso() != null && modelo.getPeso().equals(finalNumericTerm);
             boolean matchesCapacidad = finalNumericTerm != null && modelo.getCapacidad() != null && modelo.getCapacidad().equals(finalNumericTerm);
-            boolean matchesNaves = finalNumericTerm != null && modelo.getNaves().size() == finalNumericTerm;
-            return matchesNombre || matchesFabricante || matchesCapacidad || matchesNaves;
+            return matchesNombre || matchesPais || matchesPeso || matchesCapacidad;
         });
     }
 
     private boolean isFormValid() {
-        return nombreField != null && !nombreField.getText().isBlank();
+        return nombreField != null && !nombreField.getText().isBlank()
+            && pesoField != null && !pesoField.getText().isBlank()
+            && capacidadField != null && !capacidadField.getText().isBlank();
     }
 
     private void refreshTable() {
@@ -183,21 +162,17 @@ public class ModeloController {
             clearForm();
             return;
         }
-        nombreField.setText(modelo.getNombre());
-        fabricanteField.setText(modelo.getFabricante());
+        nombreField.setText(modelo.getNombreModelo());
+        pesoField.setText(modelo.getPeso() != null ? modelo.getPeso().toString() : "");
         capacidadField.setText(modelo.getCapacidad() != null ? modelo.getCapacidad().toString() : "");
+        paisFabricacionField.setText(modelo.getPaisFabricacion());
     }
 
     private void clearForm() {
-        if (nombreField != null) {
-            nombreField.clear();
-        }
-        if (fabricanteField != null) {
-            fabricanteField.clear();
-        }
-        if (capacidadField != null) {
-            capacidadField.clear();
-        }
+        if (nombreField != null) nombreField.clear();
+        if (pesoField != null) pesoField.clear();
+        if (capacidadField != null) capacidadField.clear();
+        if (paisFabricacionField != null) paisFabricacionField.clear();
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

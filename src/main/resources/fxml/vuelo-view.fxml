@@ -2,6 +2,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -9,7 +10,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.VueloController">
@@ -20,20 +20,26 @@
             </padding>
             <Label text="Gestión de vuelos" styleClass="title" />
             <GridPane hgap="10" vgap="8">
-                <Label text="Código" />
-                <TextField fx:id="codigoField" promptText="Código del vuelo" GridPane.columnIndex="1" />
+                <Label text="Nave" />
+                <ComboBox fx:id="naveCombo" promptText="Seleccione una nave" GridPane.columnIndex="1" />
 
-                <Label text="Destino" GridPane.rowIndex="1" />
-                <TextField fx:id="destinoField" promptText="Destino" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Origen" GridPane.rowIndex="1" />
+                <TextField fx:id="origenField" promptText="Ciudad de origen" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Fecha salida" GridPane.rowIndex="2" />
-                <TextField fx:id="fechaSalidaField" promptText="AAAA-MM-DD HH:MM" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Destino" GridPane.rowIndex="2" />
+                <TextField fx:id="destinoField" promptText="Ciudad de destino" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="Nave" GridPane.rowIndex="3" />
-                <ComboBox fx:id="naveCombo" promptText="Seleccione una nave" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="Fecha salida" GridPane.rowIndex="3" />
+                <DatePicker fx:id="fechaSalidaPicker" promptText="Fecha de salida" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <Label text="Tripulación" GridPane.rowIndex="4" />
-                <ComboBox fx:id="tripulacionCombo" promptText="Seleccione una tripulación" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Fecha llegada" GridPane.rowIndex="4" />
+                <DatePicker fx:id="fechaLlegadaPicker" promptText="Fecha de llegada" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                <Label text="Pasajeros" GridPane.rowIndex="5" />
+                <TextField fx:id="pasajerosField" promptText="Número de pasajeros" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                <Label text="Distancia" GridPane.rowIndex="6" />
+                <TextField fx:id="distanciaField" promptText="Distancia en km" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -41,7 +47,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por código, destino o fecha" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por origen o destino" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -49,11 +55,13 @@
     <center>
         <TableView fx:id="vueloTable">
             <columns>
-                <TableColumn fx:id="codigoColumn" text="Código" prefWidth="140" />
-                <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="200" />
-                <TableColumn fx:id="fechaColumn" text="Fecha de salida" prefWidth="180" />
-                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="160" />
-                <TableColumn fx:id="tripulacionColumn" text="Tripulación" prefWidth="180" />
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="120" />
+                <TableColumn fx:id="origenColumn" text="Origen" prefWidth="140" />
+                <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="140" />
+                <TableColumn fx:id="fechaSalidaColumn" text="Fecha salida" prefWidth="150" />
+                <TableColumn fx:id="pasajerosColumn" text="Pasajeros" prefWidth="100" />
+                <TableColumn fx:id="distanciaColumn" text="Distancia" prefWidth="100" />
             </columns>
         </TableView>
     </center>

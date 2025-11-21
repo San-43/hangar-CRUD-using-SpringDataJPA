@@ -8,11 +8,11 @@ public interface EmpresaService {
 
     List<Empresa> findAll();
 
-    Empresa findById(Long id);
+    Empresa findById(Integer id);
 
     Empresa save(Empresa entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
 }

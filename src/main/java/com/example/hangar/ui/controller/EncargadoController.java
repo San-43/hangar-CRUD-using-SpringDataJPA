@@ -1,68 +1,40 @@
 package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Encargado;
-import com.example.hangar.model.Hangar;
-import com.example.hangar.model.Persona;
 import com.example.hangar.service.EncargadoService;
-import com.example.hangar.service.HangarService;
-import com.example.hangar.service.PersonaService;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.Optional;
-
 @Component
 public class EncargadoController {
 
     private final EncargadoService encargadoService;
-    private final PersonaService personaService;
-    private final HangarService hangarService;
-
     private final ObservableList<Encargado> encargados = FXCollections.observableArrayList();
     private final FilteredList<Encargado> filteredEncargados = new FilteredList<>(encargados, encargado -> true);
-    private final ObservableList<Persona> personas = FXCollections.observableArrayList();
-    private final ObservableList<Hangar> hangares = FXCollections.observableArrayList();
 
-    public EncargadoController(EncargadoService encargadoService,
-                               PersonaService personaService,
-                               HangarService hangarService) {
+    public EncargadoController(EncargadoService encargadoService) {
         this.encargadoService = encargadoService;
-        this.personaService = personaService;
-        this.hangarService = hangarService;
     }
 
     @FXML
     private TableView<Encargado> encargadoTable;
 
     @FXML
-    private TableColumn<Encargado, Long> idColumn;
+    private TableColumn<Encargado, Integer> idColumn;
 
     @FXML
-    private TableColumn<Encargado, String> personaColumn;
+    private TableColumn<Encargado, String> nombreColumn;
 
     @FXML
-    private TableColumn<Encargado, String> documentoColumn;
-
-    @FXML
-    private TableColumn<Encargado, String> hangarColumn;
-
-    @FXML
-    private ComboBox<Persona> personaCombo;
-
-    @FXML
-    private ComboBox<Hangar> hangarCombo;
+    private TextField nombreField;
 
     @FXML
     private TextField searchField;
@@ -70,83 +42,49 @@ public class EncargadoController {
     @FXML
     public void initialize() {
         if (encargadoTable != null) {
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-            personaColumn.setCellValueFactory(cellData -> {
-                Persona persona = cellData.getValue().getPersona();
-                String nombre = persona != null ? (persona.getNombres() + " " + persona.getApellidos()).trim() : "";
-                return new SimpleStringProperty(nombre);
-            });
-            documentoColumn.setCellValueFactory(cellData -> {
-                Persona persona = cellData.getValue().getPersona();
-                String documento = persona != null ? persona.getDocumento() : "";
-                return new SimpleStringProperty(documento);
-            });
-            hangarColumn.setCellValueFactory(cellData -> {
-                Hangar hangar = cellData.getValue().getHangar();
-                return new SimpleStringProperty(hangar != null ? hangar.getCodigo() : "");
-            });
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("idEncargado"));
+            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            encargados.setAll(encargadoService.findAll());
             encargadoTable.setItems(filteredEncargados);
             encargadoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
-
-        populatePersonas();
-        populateHangares();
-        refreshTable();
     }
 
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Seleccione persona y hangar antes de guardar.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "El nombre es obligatorio.");
             return;
         }
-        Encargado selected = encargadoTable != null ? encargadoTable.getSelectionModel().getSelectedItem() : null;
-        Encargado encargado = selected != null ? encargadoService.findById(selected.getId()) : new Encargado();
-        Persona persona = personaCombo.getValue();
-        Hangar hangar = hangarCombo.getValue();
-
-        if (hangar != null) {
-            Optional<Encargado> existingByHangar = encargadoService.findByHangarId(hangar.getId());
-            if (existingByHangar.filter(found -> isDifferentRecord(encargado, found)).isPresent()) {
-                showAlert(Alert.AlertType.ERROR,
-                        "Hangar ocupado",
-                        "El hangar seleccionado ya tiene un encargado asignado.");
-                return;
-            }
-        }
-
-        if (persona != null) {
-            Optional<Encargado> existingByPersona = encargadoService.findByPersonaId(persona.getId());
-            if (existingByPersona.filter(found -> isDifferentRecord(encargado, found)).isPresent()) {
-                showAlert(Alert.AlertType.ERROR,
-                        "Persona asignada",
-                        "La persona seleccionada ya es encargada de otro hangar.");
-                return;
-            }
-        }
-
-        encargado.setPersona(persona);
-        encargado.setHangar(hangar);
+        Encargado selected = encargadoTable.getSelectionModel().getSelectedItem();
+        Encargado encargado = selected != null ? encargadoService.findById(selected.getIdEncargado()) : new Encargado();
+        encargado.setNombre(nombreField.getText().trim());
         encargadoService.save(encargado);
         refreshTable();
         clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Encargado guardado", "Los datos fueron almacenados correctamente.");
+        showAlert(Alert.AlertType.INFORMATION, "Éxito", "El encargado ha sido guardado correctamente.");
     }
 
     @FXML
     private void onEliminar() {
-        if (encargadoTable == null) {
-            return;
-        }
         Encargado selected = encargadoTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Seleccione un registro", "Debe elegir un encargado para eliminarlo.");
             return;
         }
-        encargadoService.delete(selected.getId());
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Encargado eliminado", "El encargado seleccionado fue eliminado.");
+
+        try {
+            encargadoService.delete(selected.getIdEncargado());
+            refreshTable();
+            clearForm();
+            showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El encargado seleccionado fue eliminado.");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
+                    "No se puede eliminar este encargado porque está asignado a talleres o reportes. " +
+                    "Primero debe eliminar o reasignar los registros relacionados.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el encargado: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -172,94 +110,18 @@ public class EncargadoController {
             if (encargado == null) {
                 return false;
             }
-            Persona persona = encargado.getPersona();
-            Hangar hangar = encargado.getHangar();
-            boolean matchesNombre = persona != null && persona.getNombres() != null
-                    && persona.getNombres().toLowerCase().contains(normalized);
-            boolean matchesApellido = persona != null && persona.getApellidos() != null
-                    && persona.getApellidos().toLowerCase().contains(normalized);
-            boolean matchesDocumento = persona != null && persona.getDocumento() != null
-                    && persona.getDocumento().toLowerCase().contains(normalized);
-            boolean matchesHangar = hangar != null && hangar.getCodigo() != null
-                    && hangar.getCodigo().toLowerCase().contains(normalized);
-            return matchesNombre || matchesApellido || matchesDocumento || matchesHangar;
-        });
-    }
-
-    private void populatePersonas() {
-        personas.setAll(personaService.findAll());
-        personas.sort(Comparator.comparing(persona -> persona.getNombres() != null ? persona.getNombres() : "",
-                String.CASE_INSENSITIVE_ORDER));
-        if (personaCombo == null) {
-            return;
-        }
-        personaCombo.setItems(personas);
-        personaCombo.setCellFactory(cb -> new ListCell<>() {
-            @Override
-            protected void updateItem(Persona item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getNombres() + " " + item.getApellidos() + " (" + item.getDocumento() + ")");
-                }
-            }
-        });
-        personaCombo.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Persona item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getNombres() + " " + item.getApellidos());
-                }
-            }
-        });
-    }
-
-    private void populateHangares() {
-        hangares.setAll(hangarService.findAll());
-        hangares.sort(Comparator.comparing(hangar -> hangar.getCodigo() != null ? hangar.getCodigo() : "",
-                String.CASE_INSENSITIVE_ORDER));
-        if (hangarCombo == null) {
-            return;
-        }
-        hangarCombo.setItems(hangares);
-        hangarCombo.setCellFactory(cb -> new ListCell<>() {
-            @Override
-            protected void updateItem(Hangar item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getCodigo());
-                }
-            }
-        });
-        hangarCombo.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Hangar item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getCodigo());
-                }
-            }
+            boolean matchesNombre = encargado.getNombre() != null && encargado.getNombre().toLowerCase().contains(normalized);
+            return matchesNombre;
         });
     }
 
     private boolean isFormValid() {
-        return personaCombo != null && personaCombo.getValue() != null
-                && hangarCombo != null && hangarCombo.getValue() != null;
+        return nombreField != null && !nombreField.getText().isBlank();
     }
 
     private void refreshTable() {
         encargados.setAll(encargadoService.findAll());
-        if (encargadoTable != null) {
-            encargadoTable.refresh();
-        }
+        encargadoTable.refresh();
         onBuscar();
     }
 
@@ -268,33 +130,13 @@ public class EncargadoController {
             clearForm();
             return;
         }
-        if (personaCombo != null && encargado.getPersona() != null) {
-            personaCombo.getSelectionModel().select(findPersonaById(encargado.getPersona().getId()));
-        }
-        if (hangarCombo != null && encargado.getHangar() != null) {
-            hangarCombo.getSelectionModel().select(findHangarById(encargado.getHangar().getId()));
-        }
-    }
-
-    private Persona findPersonaById(Long id) {
-        return personas.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
-    }
-
-    private Hangar findHangarById(Long id) {
-        return hangares.stream().filter(h -> h.getId().equals(id)).findFirst().orElse(null);
+        nombreField.setText(encargado.getNombre());
     }
 
     private void clearForm() {
-        if (personaCombo != null) {
-            personaCombo.getSelectionModel().clearSelection();
+        if (nombreField != null) {
+            nombreField.clear();
         }
-        if (hangarCombo != null) {
-            hangarCombo.getSelectionModel().clearSelection();
-        }
-    }
-
-    private boolean isDifferentRecord(Encargado current, Encargado existing) {
-        return current.getId() == null || !current.getId().equals(existing.getId());
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -305,3 +147,4 @@ public class EncargadoController {
         alert.showAndWait();
     }
 }
+

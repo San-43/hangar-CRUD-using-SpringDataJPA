@@ -1,18 +1,12 @@
 package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Persona;
-import com.example.hangar.model.Rol;
 import com.example.hangar.service.PersonaService;
-import com.example.hangar.service.RolService;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,45 +17,54 @@ import org.springframework.stereotype.Component;
 public class PersonaController {
 
     private final PersonaService personaService;
-    private final RolService rolService;
     private final ObservableList<Persona> personas = FXCollections.observableArrayList();
     private final FilteredList<Persona> filteredPersonas = new FilteredList<>(personas, persona -> true);
-    private final ObservableList<Rol> roles = FXCollections.observableArrayList();
 
-    public PersonaController(PersonaService personaService, RolService rolService) {
+    public PersonaController(PersonaService personaService) {
         this.personaService = personaService;
-        this.rolService = rolService;
     }
 
     @FXML
     private TableView<Persona> personaTable;
 
     @FXML
+    private TableColumn<Persona, Integer> idColumn;
+
+    @FXML
     private TableColumn<Persona, String> nombreColumn;
 
     @FXML
-    private TableColumn<Persona, String> apellidosColumn;
+    private TableColumn<Persona, String> curpColumn;
 
     @FXML
-    private TableColumn<Persona, String> documentoColumn;
+    private TableColumn<Persona, Integer> edadColumn;
 
     @FXML
-    private TableColumn<Persona, String> rolColumn;
+    private TableColumn<Persona, String> celularColumn;
 
     @FXML
-    private TableColumn<Persona, Number> tripulacionesColumn;
+    private TableColumn<Persona, Integer> hrsVueloColumn;
 
     @FXML
-    private TextField nombresField;
+    private TableColumn<Persona, String> licenciaColumn;
 
     @FXML
-    private TextField apellidosField;
+    private TextField nombreField;
 
     @FXML
-    private TextField documentoField;
+    private TextField curpField;
 
     @FXML
-    private ComboBox<Rol> rolCombo;
+    private TextField edadField;
+
+    @FXML
+    private TextField celularField;
+
+    @FXML
+    private TextField hrsVueloField;
+
+    @FXML
+    private TextField licenciaField;
 
     @FXML
     private TextField searchField;
@@ -69,51 +72,59 @@ public class PersonaController {
     @FXML
     public void initialize() {
         if (personaTable != null) {
-            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombres"));
-            apellidosColumn.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
-            documentoColumn.setCellValueFactory(new PropertyValueFactory<>("documento"));
-            rolColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                    data.getValue().getRol() != null ? data.getValue().getRol().getNombre() : ""));
-            tripulacionesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
-                    data.getValue().getTripulaciones() != null ? data.getValue().getTripulaciones().size() : 0));
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("idPersona"));
+            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+            curpColumn.setCellValueFactory(new PropertyValueFactory<>("curp"));
+            edadColumn.setCellValueFactory(new PropertyValueFactory<>("edad"));
+            celularColumn.setCellValueFactory(new PropertyValueFactory<>("celular"));
+            hrsVueloColumn.setCellValueFactory(new PropertyValueFactory<>("hrsVuelo"));
+            licenciaColumn.setCellValueFactory(new PropertyValueFactory<>("licencia"));
             personas.setAll(personaService.findAll());
             personaTable.setItems(filteredPersonas);
             personaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
-        }
-
-        if (rolCombo != null) {
-            roles.setAll(rolService.findAll());
-            rolCombo.setItems(roles);
-            rolCombo.setCellFactory(list -> new ListCell<>() {
-                @Override
-                protected void updateItem(Rol rol, boolean empty) {
-                    super.updateItem(rol, empty);
-                    setText(empty || rol == null ? null : rol.getNombre());
-                }
-            });
-            rolCombo.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Rol rol, boolean empty) {
-                    super.updateItem(rol, empty);
-                    setText(empty || rol == null ? null : rol.getNombre());
-                }
-            });
         }
     }
 
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Todos los campos son obligatorios.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "El nombre es obligatorio.");
             return;
         }
-
         Persona selected = personaTable.getSelectionModel().getSelectedItem();
-        Persona persona = selected != null ? personaService.findById(selected.getId()) : new Persona();
-        persona.setNombres(nombresField.getText().trim());
-        persona.setApellidos(apellidosField.getText().trim());
-        persona.setDocumento(documentoField.getText().trim());
-        persona.setRol(rolCombo.getValue());
+        Persona persona = selected != null ? personaService.findById(selected.getIdPersona()) : new Persona();
+
+        persona.setNombre(nombreField.getText().trim());
+        persona.setCurp(curpField.getText().trim());
+        persona.setCelular(celularField.getText().trim());
+        persona.setLicencia(licenciaField.getText().trim());
+
+        // Validar y establecer edad
+        String edadText = edadField.getText().trim();
+        if (!edadText.isEmpty()) {
+            try {
+                persona.setEdad(Integer.parseInt(edadText));
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.WARNING, "Formato incorrecto", "La edad debe ser un número entero.");
+                return;
+            }
+        } else {
+            persona.setEdad(null);
+        }
+
+        // Validar y establecer horas de vuelo
+        String hrsVueloText = hrsVueloField.getText().trim();
+        if (!hrsVueloText.isEmpty()) {
+            try {
+                persona.setHrsVuelo(Integer.parseInt(hrsVueloText));
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.WARNING, "Formato incorrecto", "Las horas de vuelo deben ser un número entero.");
+                return;
+            }
+        } else {
+            persona.setHrsVuelo(null);
+        }
+
         personaService.save(persona);
         refreshTable();
         clearForm();
@@ -128,23 +139,20 @@ public class PersonaController {
             return;
         }
 
-        // Validar si la persona tiene registros asociados
         try {
-            String constraintMessage = personaService.checkDeletionConstraints(selected.getId());
-
+            String constraintMessage = personaService.checkDeletionConstraints(selected.getIdPersona());
             if (constraintMessage != null) {
                 showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
                 return;
             }
 
-            personaService.delete(selected.getId());
+            personaService.delete(selected.getIdPersona());
             refreshTable();
             clearForm();
             showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La persona seleccionada fue eliminada.");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
-                    "No se puede eliminar esta persona porque tiene registros asociados. " +
-                    "Primero debe eliminar o reasignar los registros relacionados.");
+                    "No se puede eliminar esta persona porque tiene roles, pilotos, tripulaciones u otros registros asociados.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar la persona: " + e.getMessage());
         }
@@ -153,51 +161,8 @@ public class PersonaController {
     @FXML
     private void onLimpiar() {
         clearForm();
-        personaTable.getSelectionModel().clearSelection();
-    }
-
-    private boolean isFormValid() {
-        return nombresField != null && !nombresField.getText().isBlank()
-                && apellidosField != null && !apellidosField.getText().isBlank()
-                && documentoField != null && !documentoField.getText().isBlank()
-                && rolCombo != null && rolCombo.getValue() != null;
-    }
-
-    private void refreshTable() {
-        personas.setAll(personaService.findAll());
-        personaTable.refresh();
-        onBuscar();
-    }
-
-    private void fillForm(Persona persona) {
-        if (persona == null) {
-            clearForm();
-            return;
-        }
-        nombresField.setText(persona.getNombres());
-        apellidosField.setText(persona.getApellidos());
-        documentoField.setText(persona.getDocumento());
-        if (rolCombo != null && persona.getRol() != null) {
-            Rol rol = roles.stream()
-                    .filter(r -> r.getId().equals(persona.getRol().getId()))
-                    .findFirst()
-                    .orElse(null);
-            rolCombo.getSelectionModel().select(rol);
-        }
-    }
-
-    private void clearForm() {
-        if (nombresField != null) {
-            nombresField.clear();
-        }
-        if (apellidosField != null) {
-            apellidosField.clear();
-        }
-        if (documentoField != null) {
-            documentoField.clear();
-        }
-        if (rolCombo != null) {
-            rolCombo.getSelectionModel().clearSelection();
+        if (personaTable != null) {
+            personaTable.getSelectionModel().clearSelection();
         }
     }
 
@@ -212,17 +177,56 @@ public class PersonaController {
             return;
         }
         String normalized = term.trim().toLowerCase();
+        Integer numericTerm = null;
+        try {
+            numericTerm = Integer.parseInt(term.trim());
+        } catch (NumberFormatException ignored) {
+        }
+        Integer finalNumericTerm = numericTerm;
         filteredPersonas.setPredicate(persona -> {
             if (persona == null) {
                 return false;
             }
-            boolean matchesNombre = persona.getNombres() != null && persona.getNombres().toLowerCase().contains(normalized);
-            boolean matchesApellido = persona.getApellidos() != null && persona.getApellidos().toLowerCase().contains(normalized);
-            boolean matchesDocumento = persona.getDocumento() != null && persona.getDocumento().toLowerCase().contains(normalized);
-            boolean matchesRol = persona.getRol() != null && persona.getRol().getNombre() != null
-                    && persona.getRol().getNombre().toLowerCase().contains(normalized);
-            return matchesNombre || matchesApellido || matchesDocumento || matchesRol;
+            boolean matchesNombre = persona.getNombre() != null && persona.getNombre().toLowerCase().contains(normalized);
+            boolean matchesCurp = persona.getCurp() != null && persona.getCurp().toLowerCase().contains(normalized);
+            boolean matchesCelular = persona.getCelular() != null && persona.getCelular().toLowerCase().contains(normalized);
+            boolean matchesLicencia = persona.getLicencia() != null && persona.getLicencia().toLowerCase().contains(normalized);
+            boolean matchesEdad = finalNumericTerm != null && persona.getEdad() != null && persona.getEdad().equals(finalNumericTerm);
+            boolean matchesHrsVuelo = finalNumericTerm != null && persona.getHrsVuelo() != null && persona.getHrsVuelo().equals(finalNumericTerm);
+            return matchesNombre || matchesCurp || matchesCelular || matchesLicencia || matchesEdad || matchesHrsVuelo;
         });
+    }
+
+    private boolean isFormValid() {
+        return nombreField != null && !nombreField.getText().isBlank();
+    }
+
+    private void refreshTable() {
+        personas.setAll(personaService.findAll());
+        personaTable.refresh();
+        onBuscar();
+    }
+
+    private void fillForm(Persona persona) {
+        if (persona == null) {
+            clearForm();
+            return;
+        }
+        nombreField.setText(persona.getNombre());
+        curpField.setText(persona.getCurp());
+        celularField.setText(persona.getCelular());
+        licenciaField.setText(persona.getLicencia());
+        edadField.setText(persona.getEdad() != null ? persona.getEdad().toString() : "");
+        hrsVueloField.setText(persona.getHrsVuelo() != null ? persona.getHrsVuelo().toString() : "");
+    }
+
+    private void clearForm() {
+        if (nombreField != null) nombreField.clear();
+        if (curpField != null) curpField.clear();
+        if (edadField != null) edadField.clear();
+        if (celularField != null) celularField.clear();
+        if (hrsVueloField != null) hrsVueloField.clear();
+        if (licenciaField != null) licenciaField.clear();
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -233,3 +237,4 @@ public class PersonaController {
         alert.showAndWait();
     }
 }
+

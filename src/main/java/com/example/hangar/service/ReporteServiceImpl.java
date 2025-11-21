@@ -26,7 +26,7 @@ public class ReporteServiceImpl implements ReporteService {
 
     @Override
     @Transactional(readOnly = true)
-    public Reporte findById(Long id) {
+    public Reporte findById(Integer id) {
         return repository.findByIdWithRelations(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte " + id + " no existe"));
     }
@@ -37,7 +37,7 @@ public class ReporteServiceImpl implements ReporteService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Reporte existing = findById(id);
         repository.delete(existing);
     }

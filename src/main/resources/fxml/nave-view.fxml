@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.NaveController">
@@ -20,20 +19,17 @@
             </padding>
             <Label text="Gestión de naves" styleClass="title" />
             <GridPane hgap="10" vgap="8">
-                <Label text="Matrícula" />
-                <TextField fx:id="matriculaField" promptText="Código de matrícula" GridPane.columnIndex="1" />
+                <Label text="Empresa" GridPane.rowIndex="0" />
+                <ComboBox fx:id="empresaCombo" promptText="Seleccione una empresa" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="Estado" GridPane.rowIndex="1" />
-                <TextField fx:id="estadoField" promptText="Estado actual" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Hangar" GridPane.rowIndex="1" />
+                <ComboBox fx:id="hangarCombo" promptText="Seleccione un hangar" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                 <Label text="Modelo" GridPane.rowIndex="2" />
                 <ComboBox fx:id="modeloCombo" promptText="Seleccione un modelo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="Empresa" GridPane.rowIndex="3" />
-                <ComboBox fx:id="empresaCombo" promptText="Seleccione una empresa" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-                <Label text="Hangar" GridPane.rowIndex="4" />
-                <ComboBox fx:id="hangarCombo" promptText="Seleccione un hangar" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Estado" GridPane.rowIndex="3" />
+                <TextField fx:id="estadoField" promptText="Estado actual" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -41,7 +37,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por matrícula o estado" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por empresa, modelo o estado" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -49,13 +45,15 @@
     <center>
         <TableView fx:id="naveTable">
             <columns>
-                <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                <TableColumn fx:id="matriculaColumn" text="Matrícula" prefWidth="200" />
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                <TableColumn fx:id="empresaColumn" text="Empresa" prefWidth="130" />
+                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="130" />
+                <TableColumn fx:id="modeloColumn" text="Modelo" prefWidth="150" />
+                <TableColumn fx:id="capacidadColumn" text="Capacidad" prefWidth="90" />
+                <TableColumn fx:id="pesoColumn" text="Peso (kg)" prefWidth="90" />
                 <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="120" />
-                <TableColumn fx:id="modeloColumn" text="Modelo" prefWidth="180" />
-                <TableColumn fx:id="empresaColumn" text="Empresa" prefWidth="180" />
-                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="120" />
             </columns>
         </TableView>
     </center>
 </BorderPane>
+

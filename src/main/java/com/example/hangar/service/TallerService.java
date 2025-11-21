@@ -8,11 +8,13 @@ public interface TallerService {
 
     List<Taller> findAll();
 
-    Taller findById(Long id);
+    Taller findById(Integer id);
 
     Taller save(Taller entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
+
+    void validarEncargadoUnico(Integer idEncargado, Integer idTallerActual);
 }

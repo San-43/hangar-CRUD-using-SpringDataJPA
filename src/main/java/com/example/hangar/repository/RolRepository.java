@@ -1,11 +1,19 @@
 package com.example.hangar.repository;
 
 import com.example.hangar.model.Rol;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-public interface RolRepository extends JpaRepository<Rol, Long> {
+import java.util.List;
+import java.util.Optional;
 
-    @Query("SELECT COUNT(p) FROM Persona p WHERE p.rol.id = ?1")
-    long countPersonasByRolId(Long rolId);
+public interface RolRepository extends JpaRepository<Rol, Integer> {
+
+    @Override
+    @EntityGraph(attributePaths = {"persona"})
+    List<Rol> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {"persona"})
+    Optional<Rol> findById(Integer id);
 }

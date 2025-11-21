@@ -14,17 +14,22 @@
             </padding>
             <Label text="Tablas disponibles" styleClass="title" />
             <Label text="Selecciona una tabla para gestionar sus registros" wrapText="true" />
-            <Label text="Hangar" styleClass="subtitle" />
+
+            <Label text="Gestión del Hangar" styleClass="subtitle" />
             <Button text="Hangares" onAction="#showHangares" />
-            <Button text="Encargados" onAction="#showEncargados" />
             <Button text="Empresas" onAction="#showEmpresas" />
             <Button text="Modelos" onAction="#showModelos" />
             <Button text="Naves" onAction="#showNaves" />
+            <Button text="Encargados" onAction="#showEncargados" />
+
+            <Label text="Gestión de Personas" styleClass="subtitle" />
             <Button text="Personas" onAction="#showPersonas" />
-            <Button text="Roles" onAction="#showRoles" />
-            <Label text="Operaciones" styleClass="subtitle" />
             <Button text="Pilotos" onAction="#showPilotos" />
+            <Button text="Roles" onAction="#showRoles" />
+
+            <Label text="Operaciones" styleClass="subtitle" />
             <Button text="Talleres" onAction="#showTalleres" />
+            <Button text="Mantenimiento" onAction="#showMantenimiento" />
             <Button text="Tripulaciones" onAction="#showTripulaciones" />
             <Button text="Vuelos" onAction="#showVuelos" />
             <Button text="Reportes" onAction="#showReportes" />

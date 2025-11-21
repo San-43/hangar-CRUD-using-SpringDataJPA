@@ -93,10 +93,12 @@ public class MainController {
         loadView("/fxml/modelo-view.fxml");
     }
 
+    @FXML
+    private void showMantenimiento() {
+        loadView("/fxml/mantenimiento-view.fxml");
+    }
+
     private void loadView(String resource) {
-        if (contentPane == null) {
-            return;
-        }
         try {
             FXMLLoader loader = fxSpringIntegrator.loadView(getClass().getResource(resource));
             Node view = loader.getRoot();

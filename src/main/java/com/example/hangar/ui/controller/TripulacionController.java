@@ -2,116 +2,142 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Persona;
 import com.example.hangar.model.Tripulacion;
+import com.example.hangar.model.Vuelo;
 import com.example.hangar.service.PersonaService;
 import com.example.hangar.service.TripulacionService;
-import javafx.beans.property.SimpleIntegerProperty;
+import com.example.hangar.service.VueloService;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 @Component
 public class TripulacionController {
 
     private final TripulacionService tripulacionService;
+    private final VueloService vueloService;
     private final PersonaService personaService;
     private final ObservableList<Tripulacion> tripulaciones = FXCollections.observableArrayList();
-    private final FilteredList<Tripulacion> filteredTripulaciones = new FilteredList<>(tripulaciones, tripulacion -> true);
+    private final FilteredList<Tripulacion> filteredTripulaciones = new FilteredList<>(tripulaciones, t -> true);
+    private final ObservableList<Vuelo> vuelos = FXCollections.observableArrayList();
     private final ObservableList<Persona> personas = FXCollections.observableArrayList();
 
-    public TripulacionController(TripulacionService tripulacionService, PersonaService personaService) {
+    // Catálogo de roles de tripulación
+    private final List<String> rolesDisponibles = Arrays.asList(
+        "Capitán",
+        "Copiloto",
+        "Ingeniero de Vuelo",
+        "Auxiliar de Vuelo"
+    );
+
+    public TripulacionController(TripulacionService tripulacionService, VueloService vueloService,
+                                 PersonaService personaService) {
         this.tripulacionService = tripulacionService;
+        this.vueloService = vueloService;
         this.personaService = personaService;
     }
 
-    @FXML
-    private TableView<Tripulacion> tripulacionTable;
-
-    @FXML
-    private TableColumn<Tripulacion, Long> idColumn;
-
-    @FXML
-    private TableColumn<Tripulacion, String> nombreColumn;
-
-    @FXML
-    private TableColumn<Tripulacion, Number> integrantesColumn;
-
-    @FXML
-    private TableColumn<Tripulacion, Number> vuelosColumn;
-
-    @FXML
-    private TextField nombreField;
-
-    @FXML
-    private TextField searchField;
-
-    @FXML
-    private ListView<Persona> integrantesList;
+    @FXML private TableView<Tripulacion> tripulacionTable;
+    @FXML private TableColumn<Tripulacion, Integer> idColumn;
+    @FXML private TableColumn<Tripulacion, String> vueloColumn;
+    @FXML private TableColumn<Tripulacion, String> personaColumn;
+    @FXML private TableColumn<Tripulacion, String> rolColumn;
+    @FXML private ComboBox<Vuelo> vueloCombo;
+    @FXML private ComboBox<Persona> personaCombo;
+    @FXML private ComboBox<String> rolCombo;
+    @FXML private TextField searchField;
 
     @FXML
     public void initialize() {
-        refreshPersonas();
         if (tripulacionTable != null) {
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-            integrantesColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
-                    data.getValue().getIntegrantes() != null ? data.getValue().getIntegrantes().size() : 0));
-            vuelosColumn.setCellValueFactory(data -> new SimpleIntegerProperty(
-                    data.getValue().getVuelos() != null ? data.getValue().getVuelos().size() : 0));
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("idTripulacion"));
+            vueloColumn.setCellValueFactory(cellData -> {
+                Vuelo vuelo = cellData.getValue().getVuelo();
+                return new SimpleStringProperty(vuelo != null ?
+                    (vuelo.getOrigen() + " → " + vuelo.getDestino()) : "");
+            });
+            personaColumn.setCellValueFactory(cellData -> {
+                Persona persona = cellData.getValue().getPersona();
+                return new SimpleStringProperty(persona != null ? persona.getNombre() : "");
+            });
+            rolColumn.setCellValueFactory(cellData -> {
+                String rol = cellData.getValue().getRolTripulacion();
+                return new SimpleStringProperty(rol != null ? rol : "");
+            });
             tripulaciones.setAll(tripulacionService.findAll());
             tripulacionTable.setItems(filteredTripulaciones);
             tripulacionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
-
-        if (integrantesList != null) {
-            integrantesList.setItems(personas);
-            integrantesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            integrantesList.setCellFactory(list -> new ListCell<>() {
-                @Override
-                protected void updateItem(Persona persona, boolean empty) {
-                    super.updateItem(persona, empty);
-                    if (empty || persona == null) {
-                        setText(null);
-                    } else {
-                        String nombreCompleto = String.format("%s %s",
-                                persona.getNombres() != null ? persona.getNombres() : "",
-                                persona.getApellidos() != null ? persona.getApellidos() : "").trim();
-                        setText(nombreCompleto.isBlank() ? persona.getDocumento() : nombreCompleto);
-                    }
-                }
-            });
-        }
+        populateVuelos();
+        populatePersonas();
+        populateRoles();
     }
 
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Debe ingresar un nombre y seleccionar al menos un integrante.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Seleccione vuelo, persona y rol.");
             return;
         }
-        Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
-        Tripulacion tripulacion = selected != null ? tripulacionService.findById(selected.getId()) : new Tripulacion();
-        tripulacion.setNombre(nombreField.getText().trim());
-        if (integrantesList != null) {
-            Set<Persona> integrantesSeleccionados = new LinkedHashSet<>(integrantesList.getSelectionModel().getSelectedItems());
-            tripulacion.setIntegrantes(integrantesSeleccionados);
+
+        Vuelo vueloSeleccionado = vueloCombo.getValue();
+        Persona personaSeleccionada = personaCombo.getValue();
+        String rolSeleccionado = rolCombo.getValue();
+
+        // Validar que solo haya un Capitán por vuelo
+        if ("Capitán".equals(rolSeleccionado)) {
+            Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
+            Integer idTripulacionActual = selected != null ? selected.getIdTripulacion() : null;
+
+            // Contar capitanes existentes en este vuelo (excluyendo el actual si es edición)
+            List<Tripulacion> tripulacionesVuelo = tripulacionService.findAll().stream()
+                .filter(t -> t.getVuelo() != null && t.getVuelo().getIdVuelo().equals(vueloSeleccionado.getIdVuelo()))
+                .toList();
+            long capitanesExistentes = tripulacionesVuelo.stream()
+                .filter(t -> "Capitán".equals(t.getRolTripulacion()))
+                .filter(t -> idTripulacionActual == null || !t.getIdTripulacion().equals(idTripulacionActual))
+                .count();
+
+            if (capitanesExistentes > 0) {
+                showAlert(Alert.AlertType.ERROR, "Validación fallida",
+                    "Este vuelo ya tiene un Capitán. Solo puede haber un Capitán por vuelo.");
+                return;
+            }
         }
-        tripulacionService.save(tripulacion);
-        refreshTable();
-        clearForm();
-        showAlert(Alert.AlertType.INFORMATION, "Éxito", "La tripulación ha sido guardada correctamente.");
+
+        try {
+            Tripulacion selected = tripulacionTable.getSelectionModel().getSelectedItem();
+            Tripulacion tripulacion;
+
+            if (selected != null) {
+                tripulacion = selected;
+                tripulacion.setVuelo(vueloSeleccionado);
+                tripulacion.setPersona(personaSeleccionada);
+                tripulacion.setRolTripulacion(rolSeleccionado);
+                tripulacionService.save(tripulacion);
+                showAlert(Alert.AlertType.INFORMATION, "Registro actualizado", "La tripulación fue actualizada correctamente.");
+            } else {
+                tripulacion = new Tripulacion();
+                tripulacion.setVuelo(vueloSeleccionado);
+                tripulacion.setPersona(personaSeleccionada);
+                tripulacion.setRolTripulacion(rolSeleccionado);
+                tripulacionService.save(tripulacion);
+                showAlert(Alert.AlertType.INFORMATION, "Registro guardado", "La tripulación fue guardada correctamente.");
+            }
+
+            refreshTable();
+            clearForm();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al guardar la tripulación: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -122,23 +148,17 @@ public class TripulacionController {
             return;
         }
 
-        // Validar si la tripulación tiene registros asociados
         try {
-            String constraintMessage = tripulacionService.checkDeletionConstraints(selected.getId());
-
+            String constraintMessage = tripulacionService.checkDeletionConstraints(selected.getIdTripulacion());
             if (constraintMessage != null) {
                 showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
                 return;
             }
 
-            tripulacionService.delete(selected.getId());
+            tripulacionService.delete(selected.getIdTripulacion());
             refreshTable();
             clearForm();
             showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "La tripulación seleccionada fue eliminada.");
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
-                    "No se puede eliminar esta tripulación porque tiene registros asociados. " +
-                    "Primero debe eliminar o reasignar los registros relacionados.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar la tripulación: " + e.getMessage());
         }
@@ -154,47 +174,81 @@ public class TripulacionController {
 
     @FXML
     private void onBuscar() {
-        if (searchField == null) {
-            return;
-        }
+        if (searchField == null) return;
         String term = searchField.getText();
         if (term == null || term.isBlank()) {
-            filteredTripulaciones.setPredicate(tripulacion -> true);
+            filteredTripulaciones.setPredicate(t -> true);
             return;
         }
         String normalized = term.trim().toLowerCase();
         filteredTripulaciones.setPredicate(tripulacion -> {
-            if (tripulacion == null) {
-                return false;
-            }
-            boolean matchesNombre = tripulacion.getNombre() != null
-                    && tripulacion.getNombre().toLowerCase().contains(normalized);
-            boolean matchesIntegrante = tripulacion.getIntegrantes() != null
-                    && tripulacion.getIntegrantes().stream().anyMatch(persona -> {
-                boolean nombreMatch = persona.getNombres() != null
-                        && persona.getNombres().toLowerCase().contains(normalized);
-                boolean apellidoMatch = persona.getApellidos() != null
-                        && persona.getApellidos().toLowerCase().contains(normalized);
-                boolean documentoMatch = persona.getDocumento() != null
-                        && persona.getDocumento().toLowerCase().contains(normalized);
-                return nombreMatch || apellidoMatch || documentoMatch;
-            });
-            return matchesNombre || matchesIntegrante;
+            if (tripulacion == null) return false;
+            boolean matchesPersona = tripulacion.getPersona() != null && tripulacion.getPersona().getNombre() != null
+                    && tripulacion.getPersona().getNombre().toLowerCase().contains(normalized);
+            boolean matchesRol = tripulacion.getRolTripulacion() != null
+                    && tripulacion.getRolTripulacion().toLowerCase().contains(normalized);
+            return matchesPersona || matchesRol;
         });
     }
 
+    private void populateVuelos() {
+        vuelos.setAll(vueloService.findAll());
+        vuelos.sort(Comparator.comparing(v -> v.getIdVuelo()));
+        if (vueloCombo == null) return;
+        vueloCombo.setItems(vuelos);
+        vueloCombo.setCellFactory(cb -> new ListCell<>() {
+            @Override
+            protected void updateItem(Vuelo item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null :
+                    "ID: " + item.getIdVuelo() + " - " + item.getOrigen() + " → " + item.getDestino());
+            }
+        });
+        vueloCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Vuelo item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getOrigen() + " → " + item.getDestino());
+            }
+        });
+    }
+
+    private void populatePersonas() {
+        personas.setAll(personaService.findAll());
+        personas.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : "", String.CASE_INSENSITIVE_ORDER));
+        if (personaCombo == null) return;
+        personaCombo.setItems(personas);
+        personaCombo.setCellFactory(cb -> new ListCell<>() {
+            @Override
+            protected void updateItem(Persona item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
+            }
+        });
+        personaCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Persona item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
+            }
+        });
+    }
+
+    private void populateRoles() {
+        if (rolCombo == null) return;
+        rolCombo.setItems(FXCollections.observableArrayList(rolesDisponibles));
+    }
+
     private boolean isFormValid() {
-        boolean nombreValido = nombreField != null && !nombreField.getText().isBlank();
-        boolean integrantesValidos = integrantesList != null
-                && !integrantesList.getSelectionModel().getSelectedItems().isEmpty();
-        return nombreValido && integrantesValidos;
+        return vueloCombo != null && vueloCombo.getValue() != null
+                && personaCombo != null && personaCombo.getValue() != null
+                && rolCombo != null && rolCombo.getValue() != null;
     }
 
     private void refreshTable() {
         tripulaciones.setAll(tripulacionService.findAll());
         tripulacionTable.refresh();
         onBuscar();
-        refreshPersonas();
     }
 
     private void fillForm(Tripulacion tripulacion) {
@@ -202,31 +256,25 @@ public class TripulacionController {
             clearForm();
             return;
         }
-        nombreField.setText(tripulacion.getNombre());
-        if (integrantesList != null) {
-            integrantesList.getSelectionModel().clearSelection();
-            if (tripulacion.getIntegrantes() != null) {
-                for (Persona integrante : tripulacion.getIntegrantes()) {
-                    personas.stream()
-                            .filter(p -> p.getId() != null && p.getId().equals(integrante.getId()))
-                            .findFirst()
-                            .ifPresent(p -> integrantesList.getSelectionModel().select(p));
-                }
-            }
+        if (tripulacion.getVuelo() != null) {
+            vueloCombo.setValue(vuelos.stream()
+                    .filter(v -> v.getIdVuelo().equals(tripulacion.getVuelo().getIdVuelo()))
+                    .findFirst().orElse(null));
+        }
+        if (tripulacion.getPersona() != null) {
+            personaCombo.setValue(personas.stream()
+                    .filter(p -> p.getIdPersona().equals(tripulacion.getPersona().getIdPersona()))
+                    .findFirst().orElse(null));
+        }
+        if (tripulacion.getRolTripulacion() != null) {
+            rolCombo.setValue(tripulacion.getRolTripulacion());
         }
     }
 
     private void clearForm() {
-        if (nombreField != null) {
-            nombreField.clear();
-        }
-        if (integrantesList != null) {
-            integrantesList.getSelectionModel().clearSelection();
-        }
-    }
-
-    private void refreshPersonas() {
-        personas.setAll(personaService.findAll());
+        if (vueloCombo != null) vueloCombo.setValue(null);
+        if (personaCombo != null) personaCombo.setValue(null);
+        if (rolCombo != null) rolCombo.setValue(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -237,3 +285,4 @@ public class TripulacionController {
         alert.showAndWait();
     }
 }
+

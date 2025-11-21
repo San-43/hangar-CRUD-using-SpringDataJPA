@@ -7,8 +7,8 @@ import com.example.hangar.model.Modelo;
 import com.example.hangar.model.Nave;
 import com.example.hangar.model.Persona;
 import com.example.hangar.model.Piloto;
+import com.example.hangar.model.PilotoNave;
 import com.example.hangar.model.Reporte;
-import com.example.hangar.model.Rol;
 import com.example.hangar.model.Taller;
 import com.example.hangar.model.Tripulacion;
 import com.example.hangar.model.Vuelo;
@@ -18,9 +18,9 @@ import com.example.hangar.repository.HangarRepository;
 import com.example.hangar.repository.ModeloRepository;
 import com.example.hangar.repository.NaveRepository;
 import com.example.hangar.repository.PersonaRepository;
+import com.example.hangar.repository.PilotoNaveRepository;
 import com.example.hangar.repository.PilotoRepository;
 import com.example.hangar.repository.ReporteRepository;
-import com.example.hangar.repository.RolRepository;
 import com.example.hangar.repository.TallerRepository;
 import com.example.hangar.repository.TripulacionRepository;
 import com.example.hangar.repository.VueloRepository;
@@ -30,14 +30,13 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
 
-    private final RolRepository rolRepository;
     private final PersonaRepository personaRepository;
     private final PilotoRepository pilotoRepository;
+    private final PilotoNaveRepository pilotoNaveRepository;
     private final EmpresaRepository empresaRepository;
     private final ModeloRepository modeloRepository;
     private final HangarRepository hangarRepository;
@@ -48,9 +47,9 @@ public class DataSeeder implements CommandLineRunner {
     private final VueloRepository vueloRepository;
     private final ReporteRepository reporteRepository;
 
-    public DataSeeder(RolRepository rolRepository,
-                      PersonaRepository personaRepository,
+    public DataSeeder(PersonaRepository personaRepository,
                       PilotoRepository pilotoRepository,
+                      PilotoNaveRepository pilotoNaveRepository,
                       EmpresaRepository empresaRepository,
                       ModeloRepository modeloRepository,
                       HangarRepository hangarRepository,
@@ -60,9 +59,9 @@ public class DataSeeder implements CommandLineRunner {
                       TripulacionRepository tripulacionRepository,
                       VueloRepository vueloRepository,
                       ReporteRepository reporteRepository) {
-        this.rolRepository = rolRepository;
         this.personaRepository = personaRepository;
         this.pilotoRepository = pilotoRepository;
+        this.pilotoNaveRepository = pilotoNaveRepository;
         this.empresaRepository = empresaRepository;
         this.modeloRepository = modeloRepository;
         this.hangarRepository = hangarRepository;
@@ -76,208 +75,373 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (rolRepository.count() > 0) {
+        if (empresaRepository.count() > 0) {
             // Si ya existen datos asumimos que la base se encuentra poblada.
             return;
         }
 
-        List<Rol> roles = seedRoles();
-        List<Persona> personas = seedPersonas(roles);
-        List<Piloto> pilotos = seedPilotos(roles);
+        // Orden correcto según dependencias
         List<Empresa> empresas = seedEmpresas();
+        List<Encargado> encargados = seedEncargados();
+        List<Hangar> hangares = seedHangares();
+        List<Taller> talleres = seedTalleres(hangares, encargados);
         List<Modelo> modelos = seedModelos();
-        List<Hangar> hangares = seedHangares(empresas);
-        seedEncargados(hangares, personas);
-        List<Taller> talleres = seedTalleres(hangares);
+        List<Persona> personas = seedPersonas();
+        List<Piloto> pilotos = seedPilotos(personas);
         List<Nave> naves = seedNaves(empresas, hangares, modelos);
-        List<Tripulacion> tripulaciones = seedTripulaciones(personas, pilotos);
-        seedVuelos(naves, tripulaciones);
-        seedReportes(talleres, naves);
-    }
-
-    private List<Rol> seedRoles() {
-        Rol admin = createRol("Administrador");
-        Rol mecanico = createRol("Mecánico");
-        Rol operador = createRol("Operador");
-        return rolRepository.saveAll(Arrays.asList(admin, mecanico, operador));
-    }
-
-    private Rol createRol(String nombre) {
-        Rol rol = new Rol();
-        rol.setNombre(nombre);
-        return rol;
-    }
-
-    private List<Persona> seedPersonas(List<Rol> roles) {
-        Persona ana = createPersona("Ana", "Ramírez", "DOC-001", roles.get(0));
-        Persona carlos = createPersona("Carlos", "Pérez", "DOC-002", roles.get(1));
-        Persona lucia = createPersona("Lucía", "González", "DOC-003", roles.get(2));
-        return personaRepository.saveAll(Arrays.asList(ana, carlos, lucia));
-    }
-
-    private Persona createPersona(String nombres, String apellidos, String documento, Rol rol) {
-        Persona persona = new Persona();
-        persona.setNombres(nombres);
-        persona.setApellidos(apellidos);
-        persona.setDocumento(documento);
-        persona.setRol(rol);
-        return persona;
-    }
-
-    private List<Piloto> seedPilotos(List<Rol> roles) {
-        Piloto piloto1 = createPiloto("Mario", "López", "PIL-100", roles.get(0), "LIC-01", "10 años");
-        Piloto piloto2 = createPiloto("Sara", "Quintero", "PIL-101", roles.get(0), "LIC-02", "7 años");
-        Piloto piloto3 = createPiloto("Iván", "Núñez", "PIL-102", roles.get(0), "LIC-03", "5 años");
-        return pilotoRepository.saveAll(Arrays.asList(piloto1, piloto2, piloto3));
-    }
-
-    private Piloto createPiloto(String nombres, String apellidos, String documento, Rol rol, String licencia, String experiencia) {
-        Piloto piloto = new Piloto();
-        piloto.setNombres(nombres);
-        piloto.setApellidos(apellidos);
-        piloto.setDocumento(documento);
-        piloto.setRol(rol);
-        piloto.setLicencia(licencia);
-        piloto.setExperiencia(experiencia);
-        return piloto;
+        seedPilotoNaves(pilotos, naves);
+        List<Vuelo> vuelos = seedVuelos(naves);
+        seedTripulaciones(vuelos, personas);
+        seedReportes(naves, talleres, encargados);
     }
 
     private List<Empresa> seedEmpresas() {
-        Empresa aeroStar = createEmpresa("AeroStar", "México");
-        Empresa skyWays = createEmpresa("SkyWays", "Colombia");
-        Empresa andesAir = createEmpresa("AndesAir", "Perú");
-        return empresaRepository.saveAll(Arrays.asList(aeroStar, skyWays, andesAir));
+        Empresa e1 = new Empresa();
+        e1.setNombre("AeroMéxico");
+        e1.setContacto("contacto@aeromexico.com");
+        e1.setUbicacion("Ciudad de México");
+        e1.setRfc("AMX960530AB1");
+
+        Empresa e2 = new Empresa();
+        e2.setNombre("Avianca");
+        e2.setContacto("info@avianca.com");
+        e2.setUbicacion("Bogotá, Colombia");
+        e2.setRfc("AVI850215CD2");
+
+        Empresa e3 = new Empresa();
+        e3.setNombre("LATAM Airlines");
+        e3.setContacto("soporte@latam.com");
+        e3.setUbicacion("Santiago, Chile");
+        e3.setRfc("LAT920810EF3");
+
+        return empresaRepository.saveAll(Arrays.asList(e1, e2, e3));
     }
 
-    private Empresa createEmpresa(String nombre, String pais) {
-        Empresa empresa = new Empresa();
-        empresa.setNombre(nombre);
-        empresa.setPais(pais);
-        return empresa;
+    private List<Encargado> seedEncargados() {
+        Encargado enc1 = new Encargado();
+        enc1.setNombre("Juan Pérez García");
+
+        Encargado enc2 = new Encargado();
+        enc2.setNombre("María López Hernández");
+
+        Encargado enc3 = new Encargado();
+        enc3.setNombre("Carlos Ramírez Torres");
+
+        return encargadoRepository.saveAll(Arrays.asList(enc1, enc2, enc3));
+    }
+
+    private List<Hangar> seedHangares() {
+        Hangar h1 = new Hangar();
+        h1.setDescripcion("Hangar principal de mantenimiento");
+        h1.setCapacidad(20);
+        h1.setArea("Norte");
+        h1.setNum(1);
+
+        Hangar h2 = new Hangar();
+        h2.setDescripcion("Hangar de almacenamiento temporal");
+        h2.setCapacidad(15);
+        h2.setArea("Sur");
+        h2.setNum(2);
+
+        Hangar h3 = new Hangar();
+        h3.setDescripcion("Hangar de reparaciones mayores");
+        h3.setCapacidad(10);
+        h3.setArea("Este");
+        h3.setNum(3);
+
+        return hangarRepository.saveAll(Arrays.asList(h1, h2, h3));
+    }
+
+    private List<Taller> seedTalleres(List<Hangar> hangares, List<Encargado> encargados) {
+        Taller t1 = new Taller();
+        t1.setHangar(hangares.get(0));
+        t1.setEncargado(encargados.get(0));
+
+        Taller t2 = new Taller();
+        t2.setHangar(hangares.get(1));
+        t2.setEncargado(encargados.get(1));
+
+        Taller t3 = new Taller();
+        t3.setHangar(hangares.get(2));
+        t3.setEncargado(encargados.get(2));
+
+        return tallerRepository.saveAll(Arrays.asList(t1, t2, t3));
     }
 
     private List<Modelo> seedModelos() {
-        Modelo carguero = createModelo("Carguero X", "Boeing", 12);
-        Modelo explorador = createModelo("Explorador 9", "Airbus", 8);
-        Modelo escolta = createModelo("Escolta 3", "Embraer", 6);
-        return modeloRepository.saveAll(Arrays.asList(carguero, explorador, escolta));
+        Modelo m1 = new Modelo();
+        m1.setNombreModelo("Boeing 737-800");
+        m1.setPeso(75000);
+        m1.setCapacidad(180);
+        m1.setPaisFabricacion("Estados Unidos");
+
+        Modelo m2 = new Modelo();
+        m2.setNombreModelo("Airbus A320neo");
+        m2.setPeso(68000);
+        m2.setCapacidad(150);
+        m2.setPaisFabricacion("Francia");
+
+        Modelo m3 = new Modelo();
+        m3.setNombreModelo("Embraer E195-E2");
+        m3.setPeso(82000);
+        m3.setCapacidad(200);
+        m3.setPaisFabricacion("Brasil");
+
+        return modeloRepository.saveAll(Arrays.asList(m1, m2, m3));
     }
 
-    private Modelo createModelo(String nombre, String fabricante, Integer capacidad) {
-        Modelo modelo = new Modelo();
-        modelo.setNombre(nombre);
-        modelo.setFabricante(fabricante);
-        modelo.setCapacidad(capacidad);
-        return modelo;
+    private List<Persona> seedPersonas() {
+        Persona p1 = new Persona();
+        p1.setNombre("Ana María González");
+        p1.setCurp("GOMA900315MDFNRN01");
+        p1.setEdad(34);
+        p1.setCelular("5551234567");
+        p1.setHrsVuelo(1500);
+        p1.setLicencia("PIL-COM-2020-001");
+
+        Persona p2 = new Persona();
+        p2.setNombre("Roberto Carlos Silva");
+        p2.setCurp("SICR850720HDFLRB02");
+        p2.setEdad(39);
+        p2.setCelular("5559876543");
+        p2.setHrsVuelo(2300);
+        p2.setLicencia("PIL-COM-2018-042");
+
+        Persona p3 = new Persona();
+        p3.setNombre("Laura Patricia Méndez");
+        p3.setCurp("MEPL920510MDFNDR03");
+        p3.setEdad(32);
+        p3.setCelular("5555551234");
+        p3.setHrsVuelo(800);
+        p3.setLicencia("ING-VUELO-2021-015");
+
+        // Auxiliares de vuelo
+        Persona p4 = new Persona();
+        p4.setNombre("María Fernanda Torres");
+        p4.setCurp("TOMF950825MDFRRL04");
+        p4.setEdad(29);
+        p4.setCelular("5551112233");
+        p4.setHrsVuelo(200);
+        p4.setLicencia("TCP-2022-101");
+
+        Persona p5 = new Persona();
+        p5.setNombre("José Luis Ramírez");
+        p5.setCurp("RALJ880630HDFMSS05");
+        p5.setEdad(37);
+        p5.setCelular("5554445566");
+        p5.setHrsVuelo(350);
+        p5.setLicencia("TCP-2020-089");
+
+        return personaRepository.saveAll(Arrays.asList(p1, p2, p3, p4, p5));
     }
 
-    private List<Hangar> seedHangares(List<Empresa> empresas) {
-        Hangar alfa = createHangar("HN-ALF", 10, "Zona Norte", empresas.get(0));
-        Hangar beta = createHangar("HN-BET", 8, "Zona Central", empresas.get(1));
-        Hangar gamma = createHangar("HN-GAM", 12, "Zona Sur", empresas.get(2));
-        return hangarRepository.saveAll(Arrays.asList(alfa, beta, gamma));
+    private List<Piloto> seedPilotos(List<Persona> personas) {
+        Piloto pi1 = new Piloto();
+        pi1.setPersona(personas.get(0));
+        pi1.setLicenciaTipo("Piloto Comercial");
+        pi1.setCertificaciones("Boeing 737, Airbus A320");
+
+        Piloto pi2 = new Piloto();
+        pi2.setPersona(personas.get(1));
+        pi2.setLicenciaTipo("Piloto Comercial");
+        pi2.setCertificaciones("Boeing 777, Airbus A330");
+
+        return pilotoRepository.saveAll(Arrays.asList(pi1, pi2));
     }
 
-    private Hangar createHangar(String codigo, int capacidad, String ubicacion, Empresa empresa) {
-        Hangar hangar = new Hangar();
-        hangar.setCodigo(codigo);
-        hangar.setCapacidad(capacidad);
-        hangar.setUbicacion(ubicacion);
-        hangar.setEmpresa(empresa);
-        return hangar;
-    }
+    private void seedPilotoNaves(List<Piloto> pilotos, List<Nave> naves) {
+        if (pilotos.isEmpty() || naves.isEmpty()) {
+            return;
+        }
 
-    private void seedEncargados(List<Hangar> hangares, List<Persona> personas) {
-        Encargado enc1 = createEncargado(personas.get(0), hangares.get(0));
-        Encargado enc2 = createEncargado(personas.get(1), hangares.get(1));
-        Encargado enc3 = createEncargado(personas.get(2), hangares.get(2));
-        encargadoRepository.saveAll(Arrays.asList(enc1, enc2, enc3));
-    }
+        // Piloto 1 certificado en nave 1
+        PilotoNave pn1 = new PilotoNave();
+        pn1.setPiloto(pilotos.get(0));
+        pn1.setNave(naves.get(0));
+        pn1.setFechaCertificacion(java.time.LocalDate.now().minusYears(2));
+        pn1.setFechaExpiracion(java.time.LocalDate.now().plusYears(1));
+        pn1.setHorasEnNave(1500);
+        pn1.setEstado("ACTIVA");
 
-    private Encargado createEncargado(Persona persona, Hangar hangar) {
-        Encargado encargado = new Encargado();
-        encargado.setPersona(persona);
-        encargado.setHangar(hangar);
-        return encargado;
-    }
+        // Piloto 2 certificado en nave 2
+        PilotoNave pn2 = new PilotoNave();
+        pn2.setPiloto(pilotos.get(1));
+        pn2.setNave(naves.size() > 1 ? naves.get(1) : naves.get(0));
+        pn2.setFechaCertificacion(java.time.LocalDate.now().minusYears(3));
+        pn2.setFechaExpiracion(java.time.LocalDate.now().plusYears(2));
+        pn2.setHorasEnNave(2300);
+        pn2.setEstado("ACTIVA");
 
-    private List<Taller> seedTalleres(List<Hangar> hangares) {
-        Taller motor = createTaller("Motores", "Motores y turbinas", hangares.get(0));
-        Taller avionica = createTaller("Aviónica", "Sensores", hangares.get(1));
-        Taller fuselaje = createTaller("Fuselaje", "Reparaciones estructurales", hangares.get(2));
-        return tallerRepository.saveAll(Arrays.asList(motor, avionica, fuselaje));
-    }
-
-    private Taller createTaller(String nombre, String especialidad, Hangar hangar) {
-        Taller taller = new Taller();
-        taller.setNombre(nombre);
-        taller.setEspecialidad(especialidad);
-        taller.setHangar(hangar);
-        return taller;
+        pilotoNaveRepository.saveAll(Arrays.asList(pn1, pn2));
     }
 
     private List<Nave> seedNaves(List<Empresa> empresas, List<Hangar> hangares, List<Modelo> modelos) {
-        Nave nave1 = createNave("AV-100", "Operativa", modelos.get(0), empresas.get(0), hangares.get(0));
-        Nave nave2 = createNave("AV-200", "En mantenimiento", modelos.get(1), empresas.get(1), hangares.get(1));
-        Nave nave3 = createNave("AV-300", "Listo para despegar", modelos.get(2), empresas.get(2), hangares.get(2));
-        return naveRepository.saveAll(Arrays.asList(nave1, nave2, nave3));
+        Nave n1 = new Nave();
+        n1.setEmpresa(empresas.get(0));
+        n1.setHangar(hangares.get(0));
+        n1.setModelo(modelos.get(0));
+        n1.setEstado("Operativa");
+
+        Nave n2 = new Nave();
+        n2.setEmpresa(empresas.get(1));
+        n2.setHangar(hangares.get(1));
+        n2.setModelo(modelos.get(1));
+        n2.setEstado("En mantenimiento");
+
+        Nave n3 = new Nave();
+        n3.setEmpresa(empresas.get(2));
+        n3.setHangar(hangares.get(2));
+        n3.setModelo(modelos.get(2));
+        n3.setEstado("Operativa");
+
+        return naveRepository.saveAll(Arrays.asList(n1, n2, n3));
     }
 
-    private Nave createNave(String matricula, String estado, Modelo modelo, Empresa empresa, Hangar hangar) {
-        Nave nave = new Nave();
-        nave.setMatricula(matricula);
-        nave.setEstado(estado);
-        nave.setModelo(modelo);
-        nave.setEmpresa(empresa);
-        nave.setHangar(hangar);
-        return nave;
+    private List<Vuelo> seedVuelos(List<Nave> naves) {
+        Vuelo v1 = new Vuelo();
+        v1.setNave(naves.get(0));
+        v1.setOrigen("Ciudad de México");
+        v1.setDestino("Guadalajara");
+        v1.setFechaSalida(LocalDateTime.now().plusDays(1));
+        v1.setFechaLlegada(LocalDateTime.now().plusDays(1).plusHours(2));
+        v1.setPasajeros(150);
+        v1.setDistancia(550);
+
+        Vuelo v2 = new Vuelo();
+        v2.setNave(naves.get(1));
+        v2.setOrigen("Bogotá");
+        v2.setDestino("Lima");
+        v2.setFechaSalida(LocalDateTime.now().plusDays(2));
+        v2.setFechaLlegada(LocalDateTime.now().plusDays(2).plusHours(3));
+        v2.setPasajeros(120);
+        v2.setDistancia(1850);
+
+        Vuelo v3 = new Vuelo();
+        v3.setNave(naves.get(2));
+        v3.setOrigen("Santiago");
+        v3.setDestino("Buenos Aires");
+        v3.setFechaSalida(LocalDateTime.now().plusDays(3));
+        v3.setFechaLlegada(LocalDateTime.now().plusDays(3).plusHours(2).plusMinutes(30));
+        v3.setPasajeros(180);
+        v3.setDistancia(1400);
+
+        return vueloRepository.saveAll(Arrays.asList(v1, v2, v3));
     }
 
-    private List<Tripulacion> seedTripulaciones(List<Persona> personas, List<Piloto> pilotos) {
-        Tripulacion alfa = createTripulacion("Tripulación Alfa", Set.of(pilotos.get(0), personas.get(0)));
-        Tripulacion beta = createTripulacion("Tripulación Beta", Set.of(pilotos.get(1), personas.get(1)));
-        Tripulacion gamma = createTripulacion("Tripulación Gamma", Set.of(pilotos.get(2), personas.get(2)));
-        return tripulacionRepository.saveAll(Arrays.asList(alfa, beta, gamma));
+    private List<Tripulacion> seedTripulaciones(List<Vuelo> vuelos, List<Persona> personas) {
+        // Vuelo 1 - Tripulación completa y válida
+        Tripulacion t1_capitan = new Tripulacion();
+        t1_capitan.setVuelo(vuelos.get(0));
+        t1_capitan.setPersona(personas.get(0)); // Ana María - Capitán
+        t1_capitan.setRolTripulacion("Capitán");
+
+        Tripulacion t1_copiloto = new Tripulacion();
+        t1_copiloto.setVuelo(vuelos.get(0));
+        t1_copiloto.setPersona(personas.get(1)); // Roberto - Copiloto
+        t1_copiloto.setRolTripulacion("Copiloto");
+
+        Tripulacion t1_ingeniero = new Tripulacion();
+        t1_ingeniero.setVuelo(vuelos.get(0));
+        t1_ingeniero.setPersona(personas.get(2)); // Laura - Ingeniero
+        t1_ingeniero.setRolTripulacion("Ingeniero de Vuelo");
+
+        Tripulacion t1_aux1 = new Tripulacion();
+        t1_aux1.setVuelo(vuelos.get(0));
+        t1_aux1.setPersona(personas.get(3)); // María Fernanda - Auxiliar 1
+        t1_aux1.setRolTripulacion("Auxiliar de Vuelo");
+
+        Tripulacion t1_aux2 = new Tripulacion();
+        t1_aux2.setVuelo(vuelos.get(0));
+        t1_aux2.setPersona(personas.get(4)); // José Luis - Auxiliar 2
+        t1_aux2.setRolTripulacion("Auxiliar de Vuelo");
+
+        // Vuelo 2 - Tripulación completa (reutilizando personas)
+        Tripulacion t2_capitan = new Tripulacion();
+        t2_capitan.setVuelo(vuelos.get(1));
+        t2_capitan.setPersona(personas.get(1)); // Roberto - Capitán
+        t2_capitan.setRolTripulacion("Capitán");
+
+        Tripulacion t2_copiloto = new Tripulacion();
+        t2_copiloto.setVuelo(vuelos.get(1));
+        t2_copiloto.setPersona(personas.get(0)); // Ana María - Copiloto
+        t2_copiloto.setRolTripulacion("Copiloto");
+
+        Tripulacion t2_ingeniero = new Tripulacion();
+        t2_ingeniero.setVuelo(vuelos.get(1));
+        t2_ingeniero.setPersona(personas.get(2)); // Laura - Ingeniero
+        t2_ingeniero.setRolTripulacion("Ingeniero de Vuelo");
+
+        Tripulacion t2_aux1 = new Tripulacion();
+        t2_aux1.setVuelo(vuelos.get(1));
+        t2_aux1.setPersona(personas.get(3)); // María Fernanda - Auxiliar 1
+        t2_aux1.setRolTripulacion("Auxiliar de Vuelo");
+
+        Tripulacion t2_aux2 = new Tripulacion();
+        t2_aux2.setVuelo(vuelos.get(1));
+        t2_aux2.setPersona(personas.get(4)); // José Luis - Auxiliar 2
+        t2_aux2.setRolTripulacion("Auxiliar de Vuelo");
+
+        // Vuelo 3 - Tripulación completa
+        Tripulacion t3_capitan = new Tripulacion();
+        t3_capitan.setVuelo(vuelos.get(2));
+        t3_capitan.setPersona(personas.get(0)); // Ana María - Capitán
+        t3_capitan.setRolTripulacion("Capitán");
+
+        Tripulacion t3_copiloto = new Tripulacion();
+        t3_copiloto.setVuelo(vuelos.get(2));
+        t3_copiloto.setPersona(personas.get(1)); // Roberto - Copiloto
+        t3_copiloto.setRolTripulacion("Copiloto");
+
+        Tripulacion t3_ingeniero = new Tripulacion();
+        t3_ingeniero.setVuelo(vuelos.get(2));
+        t3_ingeniero.setPersona(personas.get(2)); // Laura - Ingeniero
+        t3_ingeniero.setRolTripulacion("Ingeniero de Vuelo");
+
+        Tripulacion t3_aux1 = new Tripulacion();
+        t3_aux1.setVuelo(vuelos.get(2));
+        t3_aux1.setPersona(personas.get(3)); // María Fernanda - Auxiliar 1
+        t3_aux1.setRolTripulacion("Auxiliar de Vuelo");
+
+        Tripulacion t3_aux2 = new Tripulacion();
+        t3_aux2.setVuelo(vuelos.get(2));
+        t3_aux2.setPersona(personas.get(4)); // José Luis - Auxiliar 2
+        t3_aux2.setRolTripulacion("Auxiliar de Vuelo");
+
+        return tripulacionRepository.saveAll(Arrays.asList(
+            t1_capitan, t1_copiloto, t1_ingeniero, t1_aux1, t1_aux2,
+            t2_capitan, t2_copiloto, t2_ingeniero, t2_aux1, t2_aux2,
+            t3_capitan, t3_copiloto, t3_ingeniero, t3_aux1, t3_aux2
+        ));
     }
 
-    private Tripulacion createTripulacion(String nombre, Set<Persona> integrantes) {
-        Tripulacion tripulacion = new Tripulacion();
-        tripulacion.setNombre(nombre);
-        tripulacion.getIntegrantes().addAll(integrantes);
-        return tripulacion;
-    }
+    private void seedReportes(List<Nave> naves, List<Taller> talleres, List<Encargado> encargados) {
+        Reporte rep1 = new Reporte();
+        rep1.setNave(naves.get(0));
+        rep1.setTaller(talleres.get(0));
+        rep1.setEncargado(encargados.get(0));
+        rep1.setDiagnostico("Revisión de motores - desgaste normal");
+        rep1.setAccionesRealizadas("Cambio de aceite y filtros");
+        rep1.setFecha(LocalDateTime.now().minusDays(5));
+        rep1.setCosto(new java.math.BigDecimal("15000.50"));
 
-    private void seedVuelos(List<Nave> naves, List<Tripulacion> tripulaciones) {
-        Vuelo vuelo1 = createVuelo("FL-001", "Bogotá", LocalDateTime.now().plusDays(1), naves.get(0), tripulaciones.get(0));
-        Vuelo vuelo2 = createVuelo("FL-002", "Quito", LocalDateTime.now().plusDays(2), naves.get(1), tripulaciones.get(1));
-        Vuelo vuelo3 = createVuelo("FL-003", "Lima", LocalDateTime.now().plusDays(3), naves.get(2), tripulaciones.get(2));
-        vueloRepository.saveAll(Arrays.asList(vuelo1, vuelo2, vuelo3));
-    }
+        Reporte rep2 = new Reporte();
+        rep2.setNave(naves.get(1));
+        rep2.setTaller(talleres.get(1));
+        rep2.setEncargado(encargados.get(1));
+        rep2.setDiagnostico("Falla en sistema hidráulico");
+        rep2.setAccionesRealizadas("Reemplazo de bomba hidráulica");
+        rep2.setFecha(LocalDateTime.now().minusDays(2));
+        rep2.setCosto(new java.math.BigDecimal("28500.00"));
 
-    private Vuelo createVuelo(String codigo, String destino, LocalDateTime fecha, Nave nave, Tripulacion tripulacion) {
-        Vuelo vuelo = new Vuelo();
-        vuelo.setCodigo(codigo);
-        vuelo.setDestino(destino);
-        vuelo.setFechaSalida(fecha);
-        vuelo.setNave(nave);
-        vuelo.setTripulacion(tripulacion);
-        return vuelo;
-    }
+        Reporte rep3 = new Reporte();
+        rep3.setNave(naves.get(2));
+        rep3.setTaller(talleres.get(2));
+        rep3.setEncargado(encargados.get(2));
+        rep3.setDiagnostico("Inspección rutinaria - estado óptimo");
+        rep3.setAccionesRealizadas("Verificación de sistemas de seguridad");
+        rep3.setFecha(LocalDateTime.now().minusDays(1));
+        rep3.setCosto(new java.math.BigDecimal("8500.75"));
 
-    private void seedReportes(List<Taller> talleres, List<Nave> naves) {
-        Reporte reporte1 = createReporte("Revisión general", "Chequeo completo de sistemas.", talleres.get(0), naves.get(0));
-        Reporte reporte2 = createReporte("Cambio de sensores", "Actualización del paquete aviónico.", talleres.get(1), naves.get(1));
-        Reporte reporte3 = createReporte("Refuerzo de fuselaje", "Corrección de microfracturas.", talleres.get(2), naves.get(2));
-        reporteRepository.saveAll(Arrays.asList(reporte1, reporte2, reporte3));
-    }
-
-    private Reporte createReporte(String titulo, String descripcion, Taller taller, Nave nave) {
-        Reporte reporte = new Reporte();
-        reporte.setTitulo(titulo);
-        reporte.setDescripcion(descripcion);
-        reporte.setTaller(taller);
-        reporte.setNave(nave);
-        return reporte;
+        reporteRepository.saveAll(Arrays.asList(rep1, rep2, rep3));
     }
 }
-

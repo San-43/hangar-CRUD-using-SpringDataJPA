@@ -3,18 +3,17 @@ package com.example.hangar.repository;
 import com.example.hangar.model.Piloto;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface PilotoRepository extends JpaRepository<Piloto, Long> {
+public interface PilotoRepository extends JpaRepository<Piloto, Integer> {
 
-    @EntityGraph(attributePaths = {"rol", "tripulaciones"})
-    @Query("select p from Piloto p")
-    List<Piloto> findAllWithRolAndTripulaciones();
+    @Override
+    @EntityGraph(attributePaths = {"persona", "navesCertificadas", "navesCertificadas.nave"})
+    List<Piloto> findAll();
 
-    @EntityGraph(attributePaths = {"tripulaciones"})
-    @Query("SELECT p FROM Piloto p WHERE p.id = ?1")
-    Optional<Piloto> findByIdWithAssociations(Long id);
+    @Override
+    @EntityGraph(attributePaths = {"persona", "navesCertificadas", "navesCertificadas.nave"})
+    Optional<Piloto> findById(Integer id);
 }

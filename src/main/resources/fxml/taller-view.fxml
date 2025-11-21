@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.TallerController">
@@ -20,14 +19,11 @@
             </padding>
             <Label text="Gestión de talleres" styleClass="title" />
             <GridPane hgap="10" vgap="8">
-                <Label text="Nombre" />
-                <TextField fx:id="nombreField" promptText="Nombre del taller" GridPane.columnIndex="1" />
+                <Label text="Hangar" />
+                <ComboBox fx:id="hangarCombo" promptText="Seleccione un hangar" GridPane.columnIndex="1" />
 
-                <Label text="Especialidad" GridPane.rowIndex="1" />
-                <TextField fx:id="especialidadField" promptText="Especialidad del taller" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                <Label text="Hangar" GridPane.rowIndex="2" />
-                <ComboBox fx:id="hangarCombo" promptText="Seleccionar hangar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Encargado" GridPane.rowIndex="1" />
+                <ComboBox fx:id="encargadoCombo" promptText="Seleccione un encargado" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -35,7 +31,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por nombre o especialidad" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por hangar o encargado" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -44,10 +40,8 @@
         <TableView fx:id="tallerTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180" />
-                <TableColumn fx:id="especialidadColumn" text="Especialidad" prefWidth="220" />
-                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="140" />
-                <TableColumn fx:id="reportesColumn" text="# Reportes" prefWidth="120" />
+                <TableColumn fx:id="hangarColumn" text="Hangar" prefWidth="300" />
+                <TableColumn fx:id="encargadoColumn" text="Encargado" prefWidth="300" />
             </columns>
         </TableView>
     </center>

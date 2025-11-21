@@ -8,11 +8,11 @@ public interface RolService {
 
     List<Rol> findAll();
 
-    Rol findById(Long id);
+    Rol findById(Integer id);
 
     Rol save(Rol entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
 }

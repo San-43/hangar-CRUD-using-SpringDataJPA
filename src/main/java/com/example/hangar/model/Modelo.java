@@ -1,14 +1,6 @@
 package com.example.hangar.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "modelos")
@@ -16,42 +8,43 @@ public class Modelo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_modelo")
+    private Integer idModelo;
 
-    @Column(nullable = false, length = 60)
-    private String nombre;
-
-    @Column(length = 60)
-    private String fabricante;
+    @Column(name = "nombre_modelo", length = 150, nullable = false, unique = true)
+    private String nombreModelo;
 
     @Column
+    private Integer peso;
+
+    @Column(name = "capacidad")
     private Integer capacidad;
 
-    @OneToMany(mappedBy = "modelo")
-    private Set<Nave> naves = new LinkedHashSet<>();
+    @Column(name = "pais_fabricacion", length = 100)
+    private String paisFabricacion;
 
-    public Long getId() {
-        return id;
+    public Integer getIdModelo() {
+        return idModelo;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdModelo(Integer idModelo) {
+        this.idModelo = idModelo;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNombreModelo() {
+        return nombreModelo;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombreModelo(String nombreModelo) {
+        this.nombreModelo = nombreModelo;
     }
 
-    public String getFabricante() {
-        return fabricante;
+    public Integer getPeso() {
+        return peso;
     }
 
-    public void setFabricante(String fabricante) {
-        this.fabricante = fabricante;
+    public void setPeso(Integer peso) {
+        this.peso = peso;
     }
 
     public Integer getCapacidad() {
@@ -62,11 +55,12 @@ public class Modelo {
         this.capacidad = capacidad;
     }
 
-    public Set<Nave> getNaves() {
-        return naves;
+    public String getPaisFabricacion() {
+        return paisFabricacion;
     }
 
-    public void setNaves(Set<Nave> naves) {
-        this.naves = naves;
+    public void setPaisFabricacion(String paisFabricacion) {
+        this.paisFabricacion = paisFabricacion;
     }
 }
+

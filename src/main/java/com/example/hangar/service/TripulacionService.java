@@ -8,11 +8,21 @@ public interface TripulacionService {
 
     List<Tripulacion> findAll();
 
-    Tripulacion findById(Long id);
+    Tripulacion findById(Integer id);
 
     Tripulacion save(Tripulacion entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
+
+    /**
+     * Valida que una persona no tenga múltiples roles en el mismo vuelo
+     */
+    void validarPersonaUnicaPorVuelo(Integer idVuelo, Integer idPersona, Integer idTripulacionActual);
+
+    /**
+     * Valida la composición completa de la tripulación de un vuelo
+     */
+    void validarComposicionTripulacion(Integer idVuelo);
 }

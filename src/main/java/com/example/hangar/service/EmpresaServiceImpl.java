@@ -21,18 +21,14 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     @Transactional(readOnly = true)
     public List<Empresa> findAll() {
-        List<Empresa> empresas = repository.findAll();
-        empresas.forEach(this::initializeAssociations);
-        return empresas;
+        return repository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Empresa findById(Long id) {
-        Empresa empresa = repository.findById(id)
+    public Empresa findById(Integer id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Empresa " + id + " no existe"));
-        initializeAssociations(empresa);
-        return empresa;
     }
 
     @Override
@@ -41,43 +37,17 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Empresa existing = findById(id);
         repository.delete(existing);
     }
 
-    private void initializeAssociations(Empresa empresa) {
-        if (empresa == null) {
-            return;
-        }
-        empresa.getHangares().size();
-        empresa.getNaves().size();
-    }
-
     @Override
     @Transactional(readOnly = true)
-    public String checkDeletionConstraints(Long id) {
-        Empresa empresa = repository.findByIdWithAssociations(id)
-                .orElseThrow(() -> new EntityNotFoundException("Empresa " + id + " no existe"));
-
-        StringBuilder asociaciones = new StringBuilder();
-        int totalAsociaciones = 0;
-
-        if (empresa.getHangares() != null && !empresa.getHangares().isEmpty()) {
-            asociaciones.append("- ").append(empresa.getHangares().size()).append(" hangar(es)\n");
-            totalAsociaciones += empresa.getHangares().size();
-        }
-
-        if (empresa.getNaves() != null && !empresa.getNaves().isEmpty()) {
-            asociaciones.append("- ").append(empresa.getNaves().size()).append(" nave(s)\n");
-            totalAsociaciones += empresa.getNaves().size();
-        }
-
-        if (totalAsociaciones > 0) {
-            return "Esta empresa tiene los siguientes registros asociados:\n" + asociaciones +
-                   "\nPrimero debe eliminar o reasignar los registros relacionados.";
-        }
-
-        return null; // No hay restricciones
+    public String checkDeletionConstraints(Integer id) {
+        Empresa empresa = findById(id);
+        // Las restricciones las maneja la base de datos con FK
+        return null;
     }
 }
+

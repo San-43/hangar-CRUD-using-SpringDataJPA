@@ -1,9 +1,11 @@
 package com.example.hangar.model;
 
-import jakarta.persistence.*;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "hangares")
@@ -11,43 +13,35 @@ public class Hangar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_hangar")
+    private Integer idHangar;
 
-    @Column(nullable = false, unique = true, length = 30)
-    private String codigo;
+    @Column(length = 150)
+    private String descripcion;
 
-    @Column(nullable = false)
+    @Column
     private Integer capacidad;
 
-    @Column(length = 120)
-    private String ubicacion;
+    @Column(length = 100)
+    private String area;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Empresa empresa;
+    @Column
+    private Integer num;
 
-    @OneToOne(mappedBy = "hangar", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Encargado encargado;
-
-    @OneToMany(mappedBy = "hangar")
-    private Set<Taller> talleres = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "hangar")
-    private Set<Nave> naves = new LinkedHashSet<>();
-
-    public Long getId() {
-        return id;
+    public Integer getIdHangar() {
+        return idHangar;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdHangar(Integer idHangar) {
+        this.idHangar = idHangar;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public Integer getCapacidad() {
@@ -58,43 +52,19 @@ public class Hangar {
         this.capacidad = capacidad;
     }
 
-    public String getUbicacion() {
-        return ubicacion;
+    public String getArea() {
+        return area;
     }
 
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
+    public void setArea(String area) {
+        this.area = area;
     }
 
-    public Empresa getEmpresa() {
-        return empresa;
+    public Integer getNum() {
+        return num;
     }
 
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-
-    public Encargado getEncargado() {
-        return encargado;
-    }
-
-    public void setEncargado(Encargado encargado) {
-        this.encargado = encargado;
-    }
-
-    public Set<Taller> getTalleres() {
-        return talleres;
-    }
-
-    public void setTalleres(Set<Taller> talleres) {
-        this.talleres = talleres;
-    }
-
-    public Set<Nave> getNaves() {
-        return naves;
-    }
-
-    public void setNaves(Set<Nave> naves) {
-        this.naves = naves;
+    public void setNum(Integer num) {
+        this.num = num;
     }
 }

@@ -2,87 +2,91 @@ package com.example.hangar.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "personas")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Persona {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_persona")
+    private Integer idPersona;
 
-    @Column(nullable = false, length = 80)
-    private String nombres;
+    @Column(length = 100)
+    private String nombre;
 
-    @Column(nullable = false, length = 80)
-    private String apellidos;
+    @Column(length = 18)
+    private String curp;
 
-    @Column(nullable = false, unique = true, length = 30)
-    private String documento;
+    @Column
+    private Integer edad;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Rol rol;
+    @Column(length = 20)
+    private String celular;
 
-    @ManyToMany(mappedBy = "integrantes")
-    private Set<Tripulacion> tripulaciones = new LinkedHashSet<>();
+    @Column(name = "hrs_vuelo")
+    private Integer hrsVuelo;
 
-    public Long getId() {
-        return id;
+    @Column(length = 50)
+    private String licencia;
+
+    public Integer getIdPersona() {
+        return idPersona;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdPersona(Integer idPersona) {
+        this.idPersona = idPersona;
     }
 
-    public String getNombres() {
-        return nombres;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getApellidos() {
-        return apellidos;
+    public String getCurp() {
+        return curp;
     }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+    public void setCurp(String curp) {
+        this.curp = curp;
     }
 
-    public String getDocumento() {
-        return documento;
+    public Integer getEdad() {
+        return edad;
     }
 
-    public void setDocumento(String documento) {
-        this.documento = documento;
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
-    public Rol getRol() {
-        return rol;
+    public String getCelular() {
+        return celular;
     }
 
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setCelular(String celular) {
+        this.celular = celular;
     }
 
-    public Set<Tripulacion> getTripulaciones() {
-        return tripulaciones;
+    public Integer getHrsVuelo() {
+        return hrsVuelo;
     }
 
-    public void setTripulaciones(Set<Tripulacion> tripulaciones) {
-        this.tripulaciones = tripulaciones;
+    public void setHrsVuelo(Integer hrsVuelo) {
+        this.hrsVuelo = hrsVuelo;
+    }
+
+    public String getLicencia() {
+        return licencia;
+    }
+
+    public void setLicencia(String licencia) {
+        this.licencia = licencia;
     }
 }

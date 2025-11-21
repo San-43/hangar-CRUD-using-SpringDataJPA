@@ -8,11 +8,11 @@ public interface HangarService {
 
     List<Hangar> findAll();
 
-    Hangar findById(Long id);
+    Hangar findById(Integer id);
 
     Hangar save(Hangar entity);
 
-    void delete(Long id);
+    void delete(Integer id);
 
-    String checkDeletionConstraints(Long id);
+    String checkDeletionConstraints(Integer id);
 }

@@ -6,54 +6,39 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "talleres")
+@Table(name = "talleres",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_encargado_unico",
+        columnNames = {"id_encargado"}
+    )
+)
 public class Taller {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 80)
-    private String nombre;
-
-    @Column(length = 120)
-    private String especialidad;
+    @Column(name = "id_taller")
+    private Integer idTaller;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_hangar")
     private Hangar hangar;
 
-    @OneToMany(mappedBy = "taller")
-    private Set<Reporte> reportes = new LinkedHashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_encargado")
+    private Encargado encargado;
 
-    public Long getId() {
-        return id;
+    public Integer getIdTaller() {
+        return idTaller;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getEspecialidad() {
-        return especialidad;
-    }
-
-    public void setEspecialidad(String especialidad) {
-        this.especialidad = especialidad;
+    public void setIdTaller(Integer idTaller) {
+        this.idTaller = idTaller;
     }
 
     public Hangar getHangar() {
@@ -64,11 +49,12 @@ public class Taller {
         this.hangar = hangar;
     }
 
-    public Set<Reporte> getReportes() {
-        return reportes;
+    public Encargado getEncargado() {
+        return encargado;
     }
 
-    public void setReportes(Set<Reporte> reportes) {
-        this.reportes = reportes;
+    public void setEncargado(Encargado encargado) {
+        this.encargado = encargado;
     }
 }
+

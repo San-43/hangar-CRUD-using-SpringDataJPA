@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.ModeloController">
@@ -24,17 +23,17 @@
                     <ColumnConstraints halignment="RIGHT" minWidth="120" />
                     <ColumnConstraints hgrow="ALWAYS" percentWidth="70" />
                 </columnConstraints>
-                <Label text="Nombre" />
-                <TextField fx:id="nombreField" promptText="Nombre del modelo"
-                           GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                <Label text="Nombre" GridPane.rowIndex="0" />
+                <TextField fx:id="nombreField" promptText="Nombre del modelo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="Fabricante" GridPane.rowIndex="1" />
-                <TextField fx:id="fabricanteField" promptText="Fabricante"
-                           GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" />
+                <Label text="Peso (kg)" GridPane.rowIndex="1" />
+                <TextField fx:id="pesoField" promptText="Peso en kilogramos" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                 <Label text="Capacidad" GridPane.rowIndex="2" />
-                <TextField fx:id="capacidadField" promptText="Capacidad de pasajeros"
-                           GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" />
+                <TextField fx:id="capacidadField" promptText="Capacidad de pasajeros" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="País de fabricación" GridPane.rowIndex="3" />
+                <TextField fx:id="paisFabricacionField" promptText="País donde se fabricó" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </GridPane>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -43,7 +42,7 @@
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
-                           promptText="Buscar por nombre, fabricante, capacidad o cantidad de naves"
+                           promptText="Buscar por nombre, peso, capacidad o país"
                            HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
@@ -57,11 +56,11 @@
             <Label text="Modelos registrados" styleClass="subtitle" />
             <TableView fx:id="modeloTable" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="200" />
-                    <TableColumn fx:id="fabricanteColumn" text="Fabricante" prefWidth="180" />
-                    <TableColumn fx:id="capacidadColumn" text="Capacidad" prefWidth="120" />
-                    <TableColumn fx:id="navesColumn" text="# Naves" prefWidth="120" />
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180" />
+                    <TableColumn fx:id="pesoColumn" text="Peso (kg)" prefWidth="100" />
+                    <TableColumn fx:id="capacidadColumn" text="Capacidad" prefWidth="100" />
+                    <TableColumn fx:id="paisFabricacionColumn" text="País de fabricación" prefWidth="200" />
                 </columns>
                 <placeholder>
                     <Label text="No hay modelos registrados. Utilice el formulario superior para agregar uno nuevo." />

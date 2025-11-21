@@ -26,33 +26,56 @@ public class TallerServiceImpl implements TallerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Taller findById(Long id) {
+    public Taller findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Taller " + id + " no existe"));
     }
 
     @Override
     public Taller save(Taller entity) {
+        // Validar que el encargado no esté asignado a otro taller
+        if (entity.getEncargado() != null) {
+            validarEncargadoUnico(
+                entity.getEncargado().getIdEncargado(),
+                entity.getIdTaller()
+            );
+        }
         return repository.save(entity);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Taller existing = findById(id);
         repository.delete(existing);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public String checkDeletionConstraints(Long id) {
-        Taller taller = repository.findByIdWithAssociations(id)
-                .orElseThrow(() -> new EntityNotFoundException("Taller " + id + " no existe"));
+    public String checkDeletionConstraints(Integer id) {
+        Taller taller = findById(id);
+        // Las restricciones las maneja la base de datos con FK
+        return null;
+    }
 
-        if (taller.getReportes() != null && !taller.getReportes().isEmpty()) {
-            return "Este taller tiene " + taller.getReportes().size() + " reporte(s) asociado(s).\n" +
-                   "Primero debe eliminar o reasignar los registros relacionados.";
+    @Override
+    @Transactional(readOnly = true)
+    public void validarEncargadoUnico(Integer idEncargado, Integer idTallerActual) {
+        List<Taller> talleresConEsteEncargado = repository.findByEncargado_IdEncargado(idEncargado);
+
+        // Filtrar el taller actual si se está editando
+        if (idTallerActual != null) {
+            talleresConEsteEncargado = talleresConEsteEncargado.stream()
+                .filter(t -> !t.getIdTaller().equals(idTallerActual))
+                .toList();
         }
 
-        return null; // No hay restricciones
+        // Verificar si el encargado ya está asignado a otro taller
+        if (!talleresConEsteEncargado.isEmpty()) {
+            Taller tallerExistente = talleresConEsteEncargado.get(0);
+            throw new IllegalArgumentException(
+                "Este encargado ya está asignado al taller ID: " + tallerExistente.getIdTaller() +
+                ". Un encargado solo puede estar asignado a un taller."
+            );
+        }
     }
 }

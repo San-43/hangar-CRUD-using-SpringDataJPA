@@ -1,15 +1,11 @@
 package com.example.hangar.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "empresas")
@@ -17,26 +13,27 @@ public class Empresa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_empresa")
+    private Integer idEmpresa;
 
-    @Column(nullable = false, unique = true, length = 120)
+    @Column(length = 100)
     private String nombre;
 
-    @Column(length = 120)
-    private String pais;
+    @Column(length = 100)
+    private String contacto;
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Hangar> hangares = new LinkedHashSet<>();
+    @Column(length = 150)
+    private String ubicacion;
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Nave> naves = new LinkedHashSet<>();
+    @Column(length = 20)
+    private String rfc;
 
-    public Long getId() {
-        return id;
+    public Integer getIdEmpresa() {
+        return idEmpresa;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdEmpresa(Integer idEmpresa) {
+        this.idEmpresa = idEmpresa;
     }
 
     public String getNombre() {
@@ -47,27 +44,27 @@ public class Empresa {
         this.nombre = nombre;
     }
 
-    public String getPais() {
-        return pais;
+    public String getContacto() {
+        return contacto;
     }
 
-    public void setPais(String pais) {
-        this.pais = pais;
+    public void setContacto(String contacto) {
+        this.contacto = contacto;
     }
 
-    public Set<Hangar> getHangares() {
-        return hangares;
+    public String getUbicacion() {
+        return ubicacion;
     }
 
-    public void setHangares(Set<Hangar> hangares) {
-        this.hangares = hangares;
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
     }
 
-    public Set<Nave> getNaves() {
-        return naves;
+    public String getRfc() {
+        return rfc;
     }
 
-    public void setNaves(Set<Nave> naves) {
-        this.naves = naves;
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
     }
 }

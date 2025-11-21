@@ -26,7 +26,7 @@ public class RolServiceImpl implements RolService {
 
     @Override
     @Transactional(readOnly = true)
-    public Rol findById(Long id) {
+    public Rol findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rol " + id + " no existe"));
     }
@@ -37,23 +37,16 @@ public class RolServiceImpl implements RolService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         Rol existing = findById(id);
         repository.delete(existing);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public String checkDeletionConstraints(Long id) {
-        findById(id); // Verificar que existe
-
-        long personasCount = repository.countPersonasByRolId(id);
-
-        if (personasCount > 0) {
-            return "Este rol tiene " + personasCount + " persona(s) asociada(s).\n" +
-                   "Primero debe eliminar o reasignar los registros relacionados.";
-        }
-
-        return null; // No hay restricciones
+    public String checkDeletionConstraints(Integer id) {
+        findById(id);
+        // Las restricciones las maneja la base de datos con FK
+        return null;
     }
 }

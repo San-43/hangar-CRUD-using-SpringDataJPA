@@ -7,3 +7,166 @@
     -fx-font-size: 22px;
     -fx-font-weight: bold;
 }
+
+/* ==========================
+   Tema y colores principales
+   ========================== */
+/* Colores pensados para tema claro y profesional */
+/* Ajusta estos valores si quieres otro tema */
+
+/* Contenedores y tarjetas */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0.0, 0.0, 2.0);
+}
+
+/* Encabezados y títulos de sección */
+.header {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 12 0;
+}
+
+/* Barra de herramientas */
+.toolbar {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #f3f6fb);
+    -fx-padding: 8;
+    -fx-spacing: 8;
+}
+
+/* Barra de estado */
+.status-bar {
+    -fx-background-color: #f3f6fb;
+    -fx-padding: 6 12;
+    -fx-font-size: 11px;
+}
+
+/* Botones */
+.button {
+    -fx-background-color: linear-gradient(#4b6cb7, #2a4a8f);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-padding: 8 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-background-color: linear-gradient(#5c79cf, #2f57a0);
+}
+.button:pressed {
+    -fx-background-color: linear-gradient(#384f86, #1c3566);
+}
+.button:disabled {
+    -fx-opacity: 0.6;
+}
+
+/* Botones secundarios */
+.button.secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: #c7d3f2;
+    -fx-border-radius: 6;
+    -fx-text-fill: #2a4a8f;
+}
+
+/* Inputs y selectores */
+.text-field, .password-field, .combo-box, .text-area {
+    -fx-background-color: white;
+    -fx-border-color: #d0d7e6;
+    -fx-border-radius: 6;
+    -fx-padding: 6 8;
+    -fx-focus-color: #4b6cb7;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .text-area:focused {
+    -fx-border-color: #4b6cb7;
+}
+
+/* Formatos de formulario */
+.form-grid {
+    -fx-hgap: 12;
+    -fx-vgap: 8;
+    -fx-padding: 12;
+}
+.form-label {
+    -fx-font-weight: 600;
+    -fx-padding: 4 0 0 0;
+}
+
+/* Tablas */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: transparent;
+}
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(#f5f7fb, #e9eef8);
+}
+.table-row-cell:odd {
+    -fx-background-color: #fbfbfd;
+}
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+.table-row-cell:selected {
+    -fx-background-color: #cfe0ff;
+}
+.table-view .column-header, .table-view .column-header .label {
+    -fx-font-weight: 600;
+    -fx-text-fill: #2a3f62;
+}
+
+/* Mensajes y estados */
+.message-success {
+    -fx-text-fill: #1f7a1f;
+}
+.message-warning {
+    -fx-text-fill: #b45b00;
+}
+.message-error {
+    -fx-text-fill: #b00020;
+}
+
+/* Enlaces */
+.link-label {
+    -fx-text-fill: #2a66d9;
+    -fx-underline: true;
+}
+
+/* Iconos */
+.icon {
+    -fx-fit-width: 16;
+    -fx-fit-height: 16;
+    -fx-opacity: 0.95;
+}
+
+/* Pequeños helpers */
+.centered {
+    -fx-alignment: center;
+}
+.right {
+    -fx-alignment: center-right;
+}
+.left {
+    -fx-alignment: center-left;
+}
+
+/* Efectos sutiles para inputs con error */
+.input-error {
+    -fx-border-color: #c0392b;
+    -fx-background-insets: 0;
+}
+
+/* Ajustes responsivos ligeros para ventanas pequeñas */
+@media screen and (max-width: 600px) {
+    .root {
+        -fx-padding: 8;
+    }
+    .label.title {
+        -fx-font-size: 18px;
+    }
+}
+
+/* ==========================
+   FIN estilos
+   ========================== */

@@ -1,12 +1,10 @@
 package com.example.hangar.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,37 +13,25 @@ public class Encargado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_encargado")
+    private Integer idEncargado;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @Column(length = 100)
+    private String nombre;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hangar_id")
-    private Hangar hangar;
-
-    public Long getId() {
-        return id;
+    public Integer getIdEncargado() {
+        return idEncargado;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdEncargado(Integer idEncargado) {
+        this.idEncargado = idEncargado;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
-    }
-
-    public Hangar getHangar() {
-        return hangar;
-    }
-
-    public void setHangar(Hangar hangar) {
-        this.hangar = hangar;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 }

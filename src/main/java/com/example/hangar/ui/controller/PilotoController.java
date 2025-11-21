@@ -1,80 +1,57 @@
 package com.example.hangar.ui.controller;
 
+import com.example.hangar.model.Persona;
 import com.example.hangar.model.Piloto;
-import com.example.hangar.model.Rol;
+import com.example.hangar.service.PersonaService;
 import com.example.hangar.service.PilotoService;
-import com.example.hangar.service.RolService;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.Comparator;
 
 @Component
 public class PilotoController {
 
     private final PilotoService pilotoService;
-    private final RolService rolService;
+    private final PersonaService personaService;
     private final ObservableList<Piloto> pilotos = FXCollections.observableArrayList();
     private final FilteredList<Piloto> filteredPilotos = new FilteredList<>(pilotos, piloto -> true);
-    private final ObservableList<Rol> roles = FXCollections.observableArrayList();
+    private final ObservableList<Persona> personas = FXCollections.observableArrayList();
 
-    public PilotoController(PilotoService pilotoService, RolService rolService) {
+    public PilotoController(PilotoService pilotoService, PersonaService personaService) {
         this.pilotoService = pilotoService;
-        this.rolService = rolService;
+        this.personaService = personaService;
     }
 
     @FXML
     private TableView<Piloto> pilotoTable;
 
     @FXML
-    private TableColumn<Piloto, String> nombreColumn;
+    private TableColumn<Piloto, Integer> idColumn;
 
     @FXML
-    private TableColumn<Piloto, String> apellidosColumn;
+    private TableColumn<Piloto, String> personaColumn;
 
     @FXML
-    private TableColumn<Piloto, String> documentoColumn;
+    private TableColumn<Piloto, String> licenciaTipoColumn;
 
     @FXML
-    private TableColumn<Piloto, String> licenciaColumn;
+    private TableColumn<Piloto, String> certificacionesColumn;
 
     @FXML
-    private TableColumn<Piloto, String> experienciaColumn;
+    private ComboBox<Persona> personaCombo;
 
     @FXML
-    private TableColumn<Piloto, String> rolColumn;
+    private TextField licenciaTipoField;
 
     @FXML
-    private TableColumn<Piloto, Number> tripulacionesColumn;
-
-    @FXML
-    private ComboBox<Rol> rolCombo;
-
-    @FXML
-    private TextField nombresField;
-
-    @FXML
-    private TextField apellidosField;
-
-    @FXML
-    private TextField documentoField;
-
-    @FXML
-    private TextField licenciaField;
-
-    @FXML
-    private TextField experienciaField;
+    private TextArea certificacionesArea;
 
     @FXML
     private TextField searchField;
@@ -82,62 +59,36 @@ public class PilotoController {
     @FXML
     public void initialize() {
         if (pilotoTable != null) {
-            nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombres"));
-            apellidosColumn.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
-            documentoColumn.setCellValueFactory(new PropertyValueFactory<>("documento"));
-            licenciaColumn.setCellValueFactory(new PropertyValueFactory<>("licencia"));
-            experienciaColumn.setCellValueFactory(piloto -> new SimpleStringProperty(
-                    piloto.getValue().getExperiencia() != null ? piloto.getValue().getExperiencia() : ""));
-            rolColumn.setCellValueFactory(piloto -> new SimpleStringProperty(
-                    piloto.getValue().getRol() != null ? piloto.getValue().getRol().getNombre() : ""));
-            tripulacionesColumn.setCellValueFactory(piloto -> new SimpleIntegerProperty(
-                    piloto.getValue().getTripulaciones() != null ? piloto.getValue().getTripulaciones().size() : 0));
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("idPiloto"));
+            personaColumn.setCellValueFactory(cellData -> {
+                Persona persona = cellData.getValue().getPersona();
+                return new SimpleStringProperty(persona != null ? persona.getNombre() : "");
+            });
+            licenciaTipoColumn.setCellValueFactory(new PropertyValueFactory<>("licenciaTipo"));
+            certificacionesColumn.setCellValueFactory(cellData -> {
+                String cert = cellData.getValue().getCertificaciones();
+                return new SimpleStringProperty(cert != null ? cert : "");
+            });
             pilotos.setAll(pilotoService.findAll());
             pilotoTable.setItems(filteredPilotos);
             pilotoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
         }
-
-        if (rolCombo != null) {
-            // Configurar celdas (opcional, solo para mostrar nombre)
-            rolCombo.setCellFactory(list -> new ListCell<>() {
-                @Override
-                protected void updateItem(Rol rol, boolean empty) {
-                    super.updateItem(rol, empty);
-                    setText(empty || rol == null ? null : rol.getNombre());
-                }
-            });
-            rolCombo.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Rol rol, boolean empty) {
-                    super.updateItem(rol, empty);
-                    setText(empty || rol == null ? null : rol.getNombre());
-                }
-            });
-
-            // Forzar solo rol 'Piloto' en el combo y deshabilitar cambios del usuario
-            Rol defaultRol = getOrCreateDefaultRolPiloto();
-            ObservableList<Rol> soloPiloto = FXCollections.observableArrayList(defaultRol);
-            rolCombo.setItems(soloPiloto);
-            rolCombo.getSelectionModel().select(defaultRol);
-            rolCombo.setDisable(true);
-        }
+        populatePersonas();
     }
 
     @FXML
     private void onGuardar() {
         if (!isFormValid()) {
-            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Todos los campos son obligatorios.");
+            showAlert(Alert.AlertType.WARNING, "Datos incompletos", "Seleccione una persona.");
             return;
         }
         Piloto selected = pilotoTable.getSelectionModel().getSelectedItem();
-        Piloto piloto = selected != null ? pilotoService.findById(selected.getId()) : new Piloto();
-        piloto.setNombres(nombresField.getText().trim());
-        piloto.setApellidos(apellidosField.getText().trim());
-        piloto.setDocumento(documentoField.getText().trim());
-        piloto.setLicencia(licenciaField.getText().trim());
-        piloto.setExperiencia(experienciaField.getText().trim());
-        // Asignar siempre el rol 'Piloto'
-        piloto.setRol(getOrCreateDefaultRolPiloto());
+        Piloto piloto = selected != null ? pilotoService.findById(selected.getIdPiloto()) : new Piloto();
+
+        piloto.setPersona(personaCombo.getValue());
+        piloto.setLicenciaTipo(licenciaTipoField.getText().trim());
+        piloto.setCertificaciones(certificacionesArea.getText().trim());
+
         pilotoService.save(piloto);
         refreshTable();
         clearForm();
@@ -152,23 +103,20 @@ public class PilotoController {
             return;
         }
 
-        // Validar si el piloto tiene registros asociados
         try {
-            String constraintMessage = pilotoService.checkDeletionConstraints(selected.getId());
-
+            String constraintMessage = pilotoService.checkDeletionConstraints(selected.getIdPiloto());
             if (constraintMessage != null) {
                 showAlert(Alert.AlertType.WARNING, "No se puede eliminar", constraintMessage);
                 return;
             }
 
-            pilotoService.delete(selected.getId());
+            pilotoService.delete(selected.getIdPiloto());
             refreshTable();
             clearForm();
             showAlert(Alert.AlertType.INFORMATION, "Registro eliminado", "El piloto seleccionado fue eliminado.");
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             showAlert(Alert.AlertType.ERROR, "No se puede eliminar",
-                    "No se puede eliminar este piloto porque tiene registros asociados. " +
-                    "Primero debe eliminar o reasignar los registros relacionados.");
+                    "No se puede eliminar este piloto porque tiene registros asociados.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Ocurrió un error al eliminar el piloto: " + e.getMessage());
         }
@@ -197,48 +145,39 @@ public class PilotoController {
             if (piloto == null) {
                 return false;
             }
-            boolean matchNombre = piloto.getNombres() != null && piloto.getNombres().toLowerCase().contains(normalized);
-            boolean matchApellido = piloto.getApellidos() != null && piloto.getApellidos().toLowerCase().contains(normalized);
-            boolean matchDocumento = piloto.getDocumento() != null && piloto.getDocumento().toLowerCase().contains(normalized);
-            boolean matchLicencia = piloto.getLicencia() != null && piloto.getLicencia().toLowerCase().contains(normalized);
-            boolean matchExperiencia = piloto.getExperiencia() != null && piloto.getExperiencia().toLowerCase().contains(normalized);
-            return matchNombre || matchApellido || matchDocumento || matchLicencia || matchExperiencia;
+            boolean matchesPersona = piloto.getPersona() != null && piloto.getPersona().getNombre() != null
+                    && piloto.getPersona().getNombre().toLowerCase().contains(normalized);
+            boolean matchesLicencia = piloto.getLicenciaTipo() != null
+                    && piloto.getLicenciaTipo().toLowerCase().contains(normalized);
+            boolean matchesCert = piloto.getCertificaciones() != null
+                    && piloto.getCertificaciones().toLowerCase().contains(normalized);
+            return matchesPersona || matchesLicencia || matchesCert;
+        });
+    }
+
+    private void populatePersonas() {
+        personas.setAll(personaService.findAll());
+        personas.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : "", String.CASE_INSENSITIVE_ORDER));
+        if (personaCombo == null) return;
+        personaCombo.setItems(personas);
+        personaCombo.setCellFactory(cb -> new ListCell<>() {
+            @Override
+            protected void updateItem(Persona item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
+            }
+        });
+        personaCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Persona item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getNombre());
+            }
         });
     }
 
     private boolean isFormValid() {
-        return nombresField != null && !nombresField.getText().isBlank()
-                && apellidosField != null && !apellidosField.getText().isBlank()
-                && documentoField != null && !documentoField.getText().isBlank()
-                && licenciaField != null && !licenciaField.getText().isBlank()
-                && experienciaField != null && !experienciaField.getText().isBlank();
-                // Nota: el rol se asigna por defecto si está vacío.
-    }
-
-    private Rol getOrCreateDefaultRolPiloto() {
-        // Buscar en la lista cargada
-        Rol defaultRol = roles.stream()
-                .filter(r -> r.getNombre() != null && r.getNombre().equalsIgnoreCase("Piloto"))
-                .findFirst()
-                .orElse(null);
-        if (defaultRol != null) {
-            return defaultRol;
-        }
-        // No existe: crearlo en BD y añadirlo a la lista
-        Rol nuevo = new Rol();
-        nuevo.setNombre("Piloto");
-        try {
-            Rol guardado = rolService.save(nuevo);
-            roles.add(guardado);
-            return guardado;
-        } catch (DataIntegrityViolationException ex) {
-            // Otro proceso pudo crearlo; recargar y devolver el existente
-            roles.setAll(rolService.findAll());
-            return roles.stream()
-                    .filter(r -> r.getNombre() != null && r.getNombre().equalsIgnoreCase("Piloto"))
-                    .findFirst()
-                    .orElse(null);
-        }
+        return personaCombo != null && personaCombo.getValue() != null;
     }
 
     private void refreshTable() {
@@ -252,41 +191,20 @@ public class PilotoController {
             clearForm();
             return;
         }
-        nombresField.setText(piloto.getNombres());
-        apellidosField.setText(piloto.getApellidos());
-        documentoField.setText(piloto.getDocumento());
-        licenciaField.setText(piloto.getLicencia());
-        experienciaField.setText(piloto.getExperiencia());
-        if (rolCombo != null) {
-            Rol defaultRol = getOrCreateDefaultRolPiloto();
-            if (rolCombo.getItems().isEmpty() || rolCombo.getItems().size() > 1 || rolCombo.getItems().get(0) != defaultRol) {
-                rolCombo.setItems(FXCollections.observableArrayList(defaultRol));
-            }
-            rolCombo.getSelectionModel().select(defaultRol);
+        if (piloto.getPersona() != null) {
+            personaCombo.setValue(personas.stream()
+                    .filter(p -> p.getIdPersona().equals(piloto.getPersona().getIdPersona()))
+                    .findFirst()
+                    .orElse(null));
         }
+        licenciaTipoField.setText(piloto.getLicenciaTipo() != null ? piloto.getLicenciaTipo() : "");
+        certificacionesArea.setText(piloto.getCertificaciones() != null ? piloto.getCertificaciones() : "");
     }
 
     private void clearForm() {
-        if (nombresField != null) {
-            nombresField.clear();
-        }
-        if (apellidosField != null) {
-            apellidosField.clear();
-        }
-        if (documentoField != null) {
-            documentoField.clear();
-        }
-        if (licenciaField != null) {
-            licenciaField.clear();
-        }
-        if (experienciaField != null) {
-            experienciaField.clear();
-        }
-        if (rolCombo != null) {
-            Rol defaultRol = getOrCreateDefaultRolPiloto();
-            rolCombo.setItems(FXCollections.observableArrayList(defaultRol));
-            rolCombo.getSelectionModel().select(defaultRol);
-        }
+        if (personaCombo != null) personaCombo.setValue(null);
+        if (licenciaTipoField != null) licenciaTipoField.clear();
+        if (certificacionesArea != null) certificacionesArea.clear();
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -297,3 +215,4 @@ public class PilotoController {
         alert.showAndWait();
     }
 }
+

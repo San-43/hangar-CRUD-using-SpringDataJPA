@@ -3,18 +3,20 @@ package com.example.hangar.repository;
 import com.example.hangar.model.Taller;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface TallerRepository extends JpaRepository<Taller, Long> {
+public interface TallerRepository extends JpaRepository<Taller, Integer> {
 
     @Override
-    @EntityGraph(attributePaths = {"hangar", "reportes"})
+    @EntityGraph(attributePaths = {"hangar", "encargado"})
     List<Taller> findAll();
 
-    @EntityGraph(attributePaths = {"reportes"})
-    @Query("SELECT t FROM Taller t WHERE t.id = ?1")
-    Optional<Taller> findByIdWithAssociations(Long id);
+    @Override
+    @EntityGraph(attributePaths = {"hangar", "encargado"})
+    Optional<Taller> findById(Integer id);
+
+    @EntityGraph(attributePaths = {"hangar", "encargado"})
+    List<Taller> findByEncargado_IdEncargado(Integer idEncargado);
 }

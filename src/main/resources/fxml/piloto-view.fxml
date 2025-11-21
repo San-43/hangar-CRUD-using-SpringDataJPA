@@ -5,12 +5,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.PilotoController">
@@ -25,23 +25,14 @@
                     <ColumnConstraints minWidth="120" halignment="RIGHT" />
                     <ColumnConstraints hgrow="ALWAYS" percentWidth="100" />
                 </columnConstraints>
-                <Label text="Nombres" />
-                <TextField fx:id="nombresField" promptText="Nombres del piloto" GridPane.columnIndex="1" />
+                <Label text="Persona" />
+                <ComboBox fx:id="personaCombo" promptText="Seleccione una persona" GridPane.columnIndex="1" />
 
-                <Label text="Apellidos" GridPane.rowIndex="1" />
-                <TextField fx:id="apellidosField" promptText="Apellidos del piloto" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Tipo de Licencia" GridPane.rowIndex="1" />
+                <TextField fx:id="licenciaTipoField" promptText="Ej: Piloto Comercial, Piloto Privado" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Documento" GridPane.rowIndex="2" />
-                <TextField fx:id="documentoField" promptText="Documento" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                <Label text="Licencia" GridPane.rowIndex="3" />
-                <TextField fx:id="licenciaField" promptText="Código de licencia" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-                <Label text="Experiencia" GridPane.rowIndex="4" />
-                <TextField fx:id="experienciaField" promptText="Experiencia resumida" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-                <Label text="Rol" GridPane.rowIndex="5" />
-                <ComboBox fx:id="rolCombo" promptText="Seleccione un rol" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Label text="Certificaciones" GridPane.rowIndex="2" />
+                <TextArea fx:id="certificacionesArea" promptText="Ej: Boeing 737, Airbus A320" GridPane.columnIndex="1" GridPane.rowIndex="2" prefRowCount="3" />
             </GridPane>
             <HBox spacing="10">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -49,7 +40,7 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Buscar por nombre, documento o licencia" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por persona, licencia o certificación" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
@@ -57,13 +48,10 @@
     <center>
         <TableView fx:id="pilotoTable">
             <columns>
-                <TableColumn fx:id="nombreColumn" text="Nombres" prefWidth="140" />
-                <TableColumn fx:id="apellidosColumn" text="Apellidos" prefWidth="140" />
-                <TableColumn fx:id="documentoColumn" text="Documento" prefWidth="120" />
-                <TableColumn fx:id="licenciaColumn" text="Licencia" prefWidth="120" />
-                <TableColumn fx:id="experienciaColumn" text="Experiencia" prefWidth="200" />
-                <TableColumn fx:id="rolColumn" text="Rol" prefWidth="140" />
-                <TableColumn fx:id="tripulacionesColumn" text="# Tripulaciones" prefWidth="140" />
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                <TableColumn fx:id="personaColumn" text="Persona" prefWidth="220" />
+                <TableColumn fx:id="licenciaTipoColumn" text="Tipo Licencia" prefWidth="180" />
+                <TableColumn fx:id="certificacionesColumn" text="Certificaciones" prefWidth="240" />
             </columns>
         </TableView>
     </center>

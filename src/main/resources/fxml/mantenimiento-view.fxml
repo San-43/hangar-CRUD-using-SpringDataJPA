@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<VBox spacing="8" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.hangar.ui.controller.MantenimientoController">
-    <children>
-        <Label text="Resumen de mantenimiento" styleClass="title" />
-        <Label fx:id="resumenLabel" text="Cargando..." />
-    </children>
+<VBox spacing="16" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.hangar.ui.controller.MantenimientoController"
+      alignment="CENTER">
+    <padding>
+        <Insets top="32" right="32" bottom="32" left="32" />
+    </padding>
+    <Label text="Resumen de mantenimiento" styleClass="title" />
+    <Label fx:id="resumenLabel" text="Cargando..." styleClass="subtitle" />
 </VBox>

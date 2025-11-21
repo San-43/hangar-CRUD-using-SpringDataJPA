@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,55 +18,47 @@ public class Reporte {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 120)
-    private String titulo;
-
-    @Column(columnDefinition = "TEXT")
-    private String descripcion;
-
-    @Column(name = "fecha_registro")
-    private LocalDateTime fechaRegistro = LocalDateTime.now();
+    @Column(name = "id_reporte")
+    private Integer idReporte;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "taller_id")
+    @JoinColumn(name = "id_nave")
+    private Nave nave;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_taller")
     private Taller taller;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nave_id")
-    private Nave nave;
+    @JoinColumn(name = "id_encargado")
+    private Encargado encargado;
 
-    public Long getId() {
-        return id;
+    @Column(columnDefinition = "TEXT")
+    private String diagnostico;
+
+    @Column(name = "acciones_realizadas", columnDefinition = "TEXT")
+    private String accionesRealizadas;
+
+    @Column
+    private LocalDateTime fecha;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal costo;
+
+    public Integer getIdReporte() {
+        return idReporte;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdReporte(Integer idReporte) {
+        this.idReporte = idReporte;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public Nave getNave() {
+        return nave;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public LocalDateTime getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public void setFechaRegistro(LocalDateTime fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
+    public void setNave(Nave nave) {
+        this.nave = nave;
     }
 
     public Taller getTaller() {
@@ -76,11 +69,43 @@ public class Reporte {
         this.taller = taller;
     }
 
-    public Nave getNave() {
-        return nave;
+    public Encargado getEncargado() {
+        return encargado;
     }
 
-    public void setNave(Nave nave) {
-        this.nave = nave;
+    public void setEncargado(Encargado encargado) {
+        this.encargado = encargado;
+    }
+
+    public String getDiagnostico() {
+        return diagnostico;
+    }
+
+    public void setDiagnostico(String diagnostico) {
+        this.diagnostico = diagnostico;
+    }
+
+    public String getAccionesRealizadas() {
+        return accionesRealizadas;
+    }
+
+    public void setAccionesRealizadas(String accionesRealizadas) {
+        this.accionesRealizadas = accionesRealizadas;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public BigDecimal getCosto() {
+        return costo;
+    }
+
+    public void setCosto(BigDecimal costo) {
+        this.costo = costo;
     }
 }

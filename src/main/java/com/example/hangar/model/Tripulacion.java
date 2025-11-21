@@ -7,62 +7,64 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "tripulaciones")
+@Table(name = "tripulaciones",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_vuelo_persona",
+        columnNames = {"id_vuelo", "id_persona"}
+    )
+)
 public class Tripulacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_tripulacion")
+    private Integer idTripulacion;
 
-    @Column(nullable = false, length = 80)
-    private String nombre;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_vuelo")
+    private Vuelo vuelo;
 
-    @ManyToMany
-    @JoinTable(name = "tripulacion_persona",
-            joinColumns = @JoinColumn(name = "tripulacion_id"),
-            inverseJoinColumns = @JoinColumn(name = "persona_id"))
-    private Set<Persona> integrantes = new LinkedHashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_persona")
+    private Persona persona;
 
-    @OneToMany(mappedBy = "tripulacion", fetch = FetchType.LAZY)
-    private Set<Vuelo> vuelos = new LinkedHashSet<>();
+    @Column(name = "rol_tripulacion", length = 50, nullable = false)
+    private String rolTripulacion;  // "Capitán", "Copiloto", "Ingeniero de Vuelo", "Auxiliar de Vuelo"
 
-    public Long getId() {
-        return id;
+    public Integer getIdTripulacion() {
+        return idTripulacion;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdTripulacion(Integer idTripulacion) {
+        this.idTripulacion = idTripulacion;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Vuelo getVuelo() {
+        return vuelo;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setVuelo(Vuelo vuelo) {
+        this.vuelo = vuelo;
     }
 
-    public Set<Persona> getIntegrantes() {
-        return integrantes;
+    public Persona getPersona() {
+        return persona;
     }
 
-    public void setIntegrantes(Set<Persona> integrantes) {
-        this.integrantes = integrantes;
+    public void setPersona(Persona persona) {
+        this.persona = persona;
     }
 
-    public Set<Vuelo> getVuelos() {
-        return vuelos;
+    public String getRolTripulacion() {
+        return rolTripulacion;
     }
 
-    public void setVuelos(Set<Vuelo> vuelos) {
-        this.vuelos = vuelos;
+    public void setRolTripulacion(String rolTripulacion) {
+        this.rolTripulacion = rolTripulacion;
     }
 }

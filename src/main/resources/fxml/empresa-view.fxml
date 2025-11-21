@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.hangar.ui.controller.EmpresaController">
     <top>
         <VBox spacing="12" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets top="16" right="16" bottom="16" left="16" />
-            </padding>
+            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
             <Label text="Gestión de empresas" styleClass="title" />
             <GridPane hgap="10" vgap="8">
                 <columnConstraints>
@@ -25,12 +14,14 @@
                     <ColumnConstraints hgrow="ALWAYS" percentWidth="70" />
                 </columnConstraints>
                 <Label text="Nombre" />
-                <TextField fx:id="nombreField" promptText="Nombre de la empresa"
-                           GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-
-                <Label text="País" GridPane.rowIndex="1" />
-                <TextField fx:id="paisField" promptText="País"
-                           GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" />
+                <TextField fx:id="nombreField" promptText="Nombre de la empresa" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                <!-- Reemplazo País por Contacto / Ubicación / RFC -->
+                <Label text="Contacto" GridPane.rowIndex="1" />
+                <TextField fx:id="contactoField" promptText="Persona o medio de contacto" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" />
+                <Label text="Ubicación" GridPane.rowIndex="2" />
+                <TextField fx:id="ubicacionField" promptText="Dirección / ubicación" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS" />
+                <Label text="RFC" GridPane.rowIndex="3" />
+                <TextField fx:id="rfcField" promptText="RFC" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.hgrow="ALWAYS" />
             </GridPane>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button text="Guardar / Actualizar" onAction="#onGuardar" />
@@ -38,26 +29,22 @@
                 <Button text="Limpiar" onAction="#onLimpiar" />
             </HBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField"
-                           promptText="Buscar por nombre, país o cantidad de hangares/naves"
-                           HBox.hgrow="ALWAYS" />
+                <TextField fx:id="searchField" promptText="Buscar por nombre, contacto, ubicación o RFC" HBox.hgrow="ALWAYS" />
                 <Button text="Buscar" onAction="#onBuscar" />
             </HBox>
         </VBox>
     </top>
     <center>
         <VBox spacing="8" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets top="0" right="16" bottom="16" left="16" />
-            </padding>
+            <padding><Insets top="0" right="16" bottom="16" left="16"/></padding>
             <Label text="Empresas registradas" styleClass="subtitle" />
             <TableView fx:id="empresaTable" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
-                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="220" />
-                    <TableColumn fx:id="paisColumn" text="País" prefWidth="160" />
-                    <TableColumn fx:id="hangaresColumn" text="# Hangares" prefWidth="140" />
-                    <TableColumn fx:id="navesColumn" text="# Naves" prefWidth="140" />
+                    <TableColumn fx:id="nombreColumn" text="Nombre" prefWidth="180" />
+                    <TableColumn fx:id="contactoColumn" text="Contacto" prefWidth="160" />
+                    <TableColumn fx:id="ubicacionColumn" text="Ubicación" prefWidth="220" />
+                    <TableColumn fx:id="rfcColumn" text="RFC" prefWidth="140" />
                 </columns>
                 <placeholder>
                     <Label text="No hay empresas registradas. Utilice el formulario superior para agregar una nueva." />
