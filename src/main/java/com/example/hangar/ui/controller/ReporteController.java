@@ -59,11 +59,34 @@ public class ReporteController {
             idColumn.setCellValueFactory(new PropertyValueFactory<>("idReporte"));
             naveColumn.setCellValueFactory(cellData -> {
                 Nave nave = cellData.getValue().getNave();
-                return new SimpleStringProperty(nave != null ? "ID: " + nave.getIdNave() : "");
+                if (nave == null) {
+                    return new SimpleStringProperty("");
+                }
+                StringBuilder sb = new StringBuilder();
+                if (nave.getEmpresa() != null && nave.getEmpresa().getNombre() != null) {
+                    sb.append(nave.getEmpresa().getNombre()).append(" - ");
+                }
+                if (nave.getModelo() != null && nave.getModelo().getNombreModelo() != null) {
+                    sb.append(nave.getModelo().getNombreModelo());
+                } else {
+                    sb.append("Nave ").append(nave.getIdNave());
+                }
+                return new SimpleStringProperty(sb.toString());
             });
             tallerColumn.setCellValueFactory(cellData -> {
                 Taller taller = cellData.getValue().getTaller();
-                return new SimpleStringProperty(taller != null ? "ID: " + taller.getIdTaller() : "");
+                if (taller == null) {
+                    return new SimpleStringProperty("");
+                }
+                String display = "";
+                if (taller.getEncargado() != null && taller.getEncargado().getNombre() != null) {
+                    display = taller.getEncargado().getNombre();
+                } else if (taller.getHangar() != null && taller.getHangar().getDescripcion() != null) {
+                    display = taller.getHangar().getDescripcion();
+                } else {
+                    display = "Taller " + taller.getIdTaller();
+                }
+                return new SimpleStringProperty(display);
             });
             encargadoColumn.setCellValueFactory(cellData -> {
                 Encargado encargado = cellData.getValue().getEncargado();
@@ -180,14 +203,40 @@ public class ReporteController {
             @Override
             protected void updateItem(Nave item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdNave() + " - " + item.getEstado());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    if (item.getEmpresa() != null && item.getEmpresa().getNombre() != null) {
+                        sb.append(item.getEmpresa().getNombre()).append(" - ");
+                    }
+                    if (item.getModelo() != null && item.getModelo().getNombreModelo() != null) {
+                        sb.append(item.getModelo().getNombreModelo());
+                    } else {
+                        sb.append("Nave ").append(item.getIdNave());
+                    }
+                    setText(sb.toString());
+                }
             }
         });
         naveCombo.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(Nave item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdNave());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    if (item.getEmpresa() != null && item.getEmpresa().getNombre() != null) {
+                        sb.append(item.getEmpresa().getNombre()).append(" - ");
+                    }
+                    if (item.getModelo() != null && item.getModelo().getNombreModelo() != null) {
+                        sb.append(item.getModelo().getNombreModelo());
+                    } else {
+                        sb.append("Nave ").append(item.getIdNave());
+                    }
+                    setText(sb.toString());
+                }
             }
         });
     }
@@ -201,14 +250,38 @@ public class ReporteController {
             @Override
             protected void updateItem(Taller item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdTaller());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String display = "";
+                    if (item.getEncargado() != null && item.getEncargado().getNombre() != null) {
+                        display = item.getEncargado().getNombre();
+                    } else if (item.getHangar() != null && item.getHangar().getDescripcion() != null) {
+                        display = item.getHangar().getDescripcion();
+                    } else {
+                        display = "Taller " + item.getIdTaller();
+                    }
+                    setText(display);
+                }
             }
         });
         tallerCombo.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(Taller item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdTaller());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String display = "";
+                    if (item.getEncargado() != null && item.getEncargado().getNombre() != null) {
+                        display = item.getEncargado().getNombre();
+                    } else if (item.getHangar() != null && item.getHangar().getDescripcion() != null) {
+                        display = item.getHangar().getDescripcion();
+                    } else {
+                        display = "Taller " + item.getIdTaller();
+                    }
+                    setText(display);
+                }
             }
         });
     }

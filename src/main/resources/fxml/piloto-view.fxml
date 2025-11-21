@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -46,13 +47,32 @@
         </VBox>
     </top>
     <center>
-        <TableView fx:id="pilotoTable">
-            <columns>
-                <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
-                <TableColumn fx:id="personaColumn" text="Persona" prefWidth="220" />
-                <TableColumn fx:id="licenciaTipoColumn" text="Tipo Licencia" prefWidth="180" />
-                <TableColumn fx:id="certificacionesColumn" text="Certificaciones" prefWidth="240" />
-            </columns>
-        </TableView>
+        <SplitPane dividerPositions="0.5">
+            <VBox spacing="10" style="-fx-padding: 10;">
+                <Label text="Pilotos" styleClass="subtitle" />
+                <TableView fx:id="pilotoTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+                        <TableColumn fx:id="personaColumn" text="Persona" prefWidth="220" />
+                        <TableColumn fx:id="licenciaTipoColumn" text="Tipo Licencia" prefWidth="180" />
+                        <TableColumn fx:id="certificacionesColumn" text="Certificaciones" prefWidth="240" />
+                    </columns>
+                </TableView>
+            </VBox>
+            <VBox spacing="10" style="-fx-padding: 10;">
+                <Label text="Naves Pilotadas (Se crean automáticamente al registrar vuelos)" styleClass="subtitle" />
+                <TableView fx:id="navesTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="naveIdColumn" text="ID Nave" prefWidth="70" />
+                        <TableColumn fx:id="naveModeloColumn" text="Modelo" prefWidth="150" />
+                        <TableColumn fx:id="naveMatriculaColumn" text="Matrícula" prefWidth="120" />
+                        <TableColumn fx:id="fechaCertifColumn" text="Certificación" prefWidth="120" />
+                        <TableColumn fx:id="fechaExpiracionColumn" text="Expiración" prefWidth="120" />
+                        <TableColumn fx:id="horasColumn" text="Horas" prefWidth="80" />
+                        <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="100" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </SplitPane>
     </center>
 </BorderPane>

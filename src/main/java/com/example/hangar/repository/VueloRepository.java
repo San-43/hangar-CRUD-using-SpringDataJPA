@@ -9,11 +9,11 @@ import java.util.Optional;
 public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
 
     @Override
-    @EntityGraph(attributePaths = {"nave"})
+    @EntityGraph(attributePaths = {"nave", "nave.empresa", "nave.modelo"})
     List<Vuelo> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"nave"})
+    @EntityGraph(attributePaths = {"nave", "nave.empresa", "nave.modelo"})
     Optional<Vuelo> findById(Integer id);
 }
 

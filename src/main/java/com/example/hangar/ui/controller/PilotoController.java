@@ -2,7 +2,9 @@ package com.example.hangar.ui.controller;
 
 import com.example.hangar.model.Persona;
 import com.example.hangar.model.Piloto;
+import com.example.hangar.model.PilotoNave;
 import com.example.hangar.service.PersonaService;
+import com.example.hangar.service.PilotoNaveService;
 import com.example.hangar.service.PilotoService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -13,20 +15,26 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 
 @Component
 public class PilotoController {
 
     private final PilotoService pilotoService;
     private final PersonaService personaService;
+    private final PilotoNaveService pilotoNaveService;
     private final ObservableList<Piloto> pilotos = FXCollections.observableArrayList();
     private final FilteredList<Piloto> filteredPilotos = new FilteredList<>(pilotos, piloto -> true);
     private final ObservableList<Persona> personas = FXCollections.observableArrayList();
+    private final ObservableList<PilotoNave> navesPilotadas = FXCollections.observableArrayList();
 
-    public PilotoController(PilotoService pilotoService, PersonaService personaService) {
+    public PilotoController(PilotoService pilotoService, PersonaService personaService,
+                           PilotoNaveService pilotoNaveService) {
         this.pilotoService = pilotoService;
         this.personaService = personaService;
+        this.pilotoNaveService = pilotoNaveService;
     }
 
     @FXML
@@ -57,23 +65,88 @@ public class PilotoController {
     private TextField searchField;
 
     @FXML
+    private TableView<PilotoNave> navesTable;
+
+    @FXML
+    private TableColumn<PilotoNave, Integer> naveIdColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, String> naveModeloColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, String> naveMatriculaColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, LocalDate> fechaCertifColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, LocalDate> fechaExpiracionColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, Integer> horasColumn;
+
+    @FXML
+    private TableColumn<PilotoNave, String> estadoColumn;
+
+    @FXML
     public void initialize() {
-        if (pilotoTable != null) {
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("idPiloto"));
-            personaColumn.setCellValueFactory(cellData -> {
-                Persona persona = cellData.getValue().getPersona();
-                return new SimpleStringProperty(persona != null ? persona.getNombre() : "");
-            });
-            licenciaTipoColumn.setCellValueFactory(new PropertyValueFactory<>("licenciaTipo"));
-            certificacionesColumn.setCellValueFactory(cellData -> {
-                String cert = cellData.getValue().getCertificaciones();
-                return new SimpleStringProperty(cert != null ? cert : "");
-            });
-            pilotos.setAll(pilotoService.findAll());
-            pilotoTable.setItems(filteredPilotos);
-            pilotoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> fillForm(newSel));
+        try {
+            // Inicializar datos de personas
+            populatePersonas();
+
+            // Configurar tabla de pilotos
+            if (pilotoTable != null) {
+                idColumn.setCellValueFactory(new PropertyValueFactory<>("idPiloto"));
+                personaColumn.setCellValueFactory(cellData -> {
+                    Persona persona = cellData.getValue().getPersona();
+                    return new SimpleStringProperty(persona != null ? persona.getNombre() : "");
+                });
+                licenciaTipoColumn.setCellValueFactory(new PropertyValueFactory<>("licenciaTipo"));
+                certificacionesColumn.setCellValueFactory(cellData -> {
+                    String cert = cellData.getValue().getCertificaciones();
+                    return new SimpleStringProperty(cert != null ? cert : "");
+                });
+                pilotos.setAll(pilotoService.findAll());
+                pilotoTable.setItems(filteredPilotos);
+                pilotoTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+                    try {
+                        fillForm(newSel);
+                        loadNavesPilotadas(newSel);
+                    } catch (Exception e) {
+                        System.err.println("Error al seleccionar piloto: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            // Configurar tabla de naves pilotadas (solo lectura)
+            if (navesTable != null) {
+                naveIdColumn.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getNave().getIdNave()));
+                naveModeloColumn.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getNave().getModelo() != null ?
+                        cellData.getValue().getNave().getModelo().getNombreModelo() : ""));
+                naveMatriculaColumn.setCellValueFactory(cellData ->
+                    new SimpleStringProperty("Nave " + cellData.getValue().getNave().getIdNave()));
+                fechaCertifColumn.setCellValueFactory(new PropertyValueFactory<>("fechaCertificacion"));
+                fechaExpiracionColumn.setCellValueFactory(new PropertyValueFactory<>("fechaExpiracion"));
+                horasColumn.setCellValueFactory(new PropertyValueFactory<>("horasEnNave"));
+                estadoColumn.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+                navesTable.setItems(navesPilotadas);
+            }
+        } catch (Exception e) {
+            System.err.println("Error en PilotoController.initialize(): " + e.getMessage());
+            e.printStackTrace();
         }
-        populatePersonas();
+    }
+
+    private void loadNavesPilotadas(Piloto piloto) {
+        navesPilotadas.clear();
+        if (piloto != null && piloto.getIdPiloto() != null) {
+            List<PilotoNave> naves = pilotoNaveService.findByPilotoId(piloto.getIdPiloto());
+            navesPilotadas.setAll(naves);
+        }
     }
 
     @FXML
@@ -156,24 +229,34 @@ public class PilotoController {
     }
 
     private void populatePersonas() {
-        personas.setAll(personaService.findAll());
-        personas.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : "", String.CASE_INSENSITIVE_ORDER));
-        if (personaCombo == null) return;
-        personaCombo.setItems(personas);
-        personaCombo.setCellFactory(cb -> new ListCell<>() {
-            @Override
-            protected void updateItem(Persona item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNombre());
+        try {
+            if (personaService == null) {
+                System.err.println("personaService is null");
+                return;
             }
-        });
-        personaCombo.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Persona item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNombre());
-            }
-        });
+            List<Persona> allPersonas = personaService.findAll();
+            personas.setAll(allPersonas);
+            personas.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : "", String.CASE_INSENSITIVE_ORDER));
+            if (personaCombo == null) return;
+            personaCombo.setItems(personas);
+            personaCombo.setCellFactory(cb -> new ListCell<>() {
+                @Override
+                protected void updateItem(Persona item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item.getNombre());
+                }
+            });
+            personaCombo.setButtonCell(new ListCell<>() {
+                @Override
+                protected void updateItem(Persona item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? null : item.getNombre());
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Error en populatePersonas: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private boolean isFormValid() {
@@ -205,6 +288,7 @@ public class PilotoController {
         if (personaCombo != null) personaCombo.setValue(null);
         if (licenciaTipoField != null) licenciaTipoField.clear();
         if (certificacionesArea != null) certificacionesArea.clear();
+        navesPilotadas.clear();
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

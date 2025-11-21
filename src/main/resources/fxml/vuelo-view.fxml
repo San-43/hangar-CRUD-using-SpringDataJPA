@@ -57,10 +57,11 @@
         <TableView fx:id="vueloTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
-                <TableColumn fx:id="naveColumn" text="Nave" prefWidth="120" />
+                <TableColumn fx:id="naveColumn" text="Nave (Empresa - Modelo)" prefWidth="200" />
                 <TableColumn fx:id="origenColumn" text="Origen" prefWidth="140" />
                 <TableColumn fx:id="destinoColumn" text="Destino" prefWidth="140" />
                 <TableColumn fx:id="fechaSalidaColumn" text="Fecha salida" prefWidth="150" />
+                <TableColumn fx:id="fechaLlegadaColumn" text="Fecha llegada" prefWidth="150" />
                 <TableColumn fx:id="pasajerosColumn" text="Pasajeros" prefWidth="100" />
                 <TableColumn fx:id="distanciaColumn" text="Distancia" prefWidth="100" />
             </columns>

@@ -42,6 +42,7 @@ public class VueloController {
     @FXML private TableColumn<Vuelo, String> origenColumn;
     @FXML private TableColumn<Vuelo, String> destinoColumn;
     @FXML private TableColumn<Vuelo, String> fechaSalidaColumn;
+    @FXML private TableColumn<Vuelo, String> fechaLlegadaColumn;
     @FXML private TableColumn<Vuelo, Integer> pasajerosColumn;
     @FXML private TableColumn<Vuelo, Integer> distanciaColumn;
     @FXML private ComboBox<Nave> naveCombo;
@@ -59,12 +60,29 @@ public class VueloController {
             idColumn.setCellValueFactory(new PropertyValueFactory<>("idVuelo"));
             naveColumn.setCellValueFactory(cellData -> {
                 Nave nave = cellData.getValue().getNave();
-                return new SimpleStringProperty(nave != null ? "ID: " + nave.getIdNave() : "");
+                if (nave == null) {
+                    return new SimpleStringProperty("");
+                }
+                StringBuilder sb = new StringBuilder();
+                if (nave.getEmpresa() != null && nave.getEmpresa().getNombre() != null) {
+                    sb.append(nave.getEmpresa().getNombre()).append(" - ");
+                }
+                if (nave.getModelo() != null && nave.getModelo().getNombreModelo() != null) {
+                    sb.append(nave.getModelo().getNombreModelo());
+                } else {
+                    sb.append("Nave ").append(nave.getIdNave());
+                }
+                return new SimpleStringProperty(sb.toString());
             });
             origenColumn.setCellValueFactory(new PropertyValueFactory<>("origen"));
             destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destino"));
             fechaSalidaColumn.setCellValueFactory(cellData -> {
                 LocalDateTime fecha = cellData.getValue().getFechaSalida();
+                String formatted = fecha != null ? fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
+                return new SimpleStringProperty(formatted);
+            });
+            fechaLlegadaColumn.setCellValueFactory(cellData -> {
+                LocalDateTime fecha = cellData.getValue().getFechaLlegada();
                 String formatted = fecha != null ? fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
                 return new SimpleStringProperty(formatted);
             });
@@ -182,14 +200,40 @@ public class VueloController {
             @Override
             protected void updateItem(Nave item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdNave() + " - " + item.getEstado());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    if (item.getEmpresa() != null && item.getEmpresa().getNombre() != null) {
+                        sb.append(item.getEmpresa().getNombre()).append(" - ");
+                    }
+                    if (item.getModelo() != null && item.getModelo().getNombreModelo() != null) {
+                        sb.append(item.getModelo().getNombreModelo());
+                    } else {
+                        sb.append("Nave ").append(item.getIdNave());
+                    }
+                    setText(sb.toString());
+                }
             }
         });
         naveCombo.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(Nave item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null : "ID: " + item.getIdNave());
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    if (item.getEmpresa() != null && item.getEmpresa().getNombre() != null) {
+                        sb.append(item.getEmpresa().getNombre()).append(" - ");
+                    }
+                    if (item.getModelo() != null && item.getModelo().getNombreModelo() != null) {
+                        sb.append(item.getModelo().getNombreModelo());
+                    } else {
+                        sb.append("Nave ").append(item.getIdNave());
+                    }
+                    setText(sb.toString());
+                }
             }
         });
     }
