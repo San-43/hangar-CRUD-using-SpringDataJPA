@@ -43,3 +43,4 @@ This project is a desktop management panel for a hangar operation. It uses **Spr
 ## Notes
 - SQL logging is enabled by default (`logging.level.org.hibernate.SQL=debug`) to help observe generated queries.
 - Adjust `spring.jpa.hibernate.ddl-auto` if you prefer a different schema management strategy.
+- Feel free to contribute through a pull request.
